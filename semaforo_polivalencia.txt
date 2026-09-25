@@ -1,0 +1,31 @@
+1.	Mapeamento de todas as tarefas do departamento
+Serve para saber quais são todos os serviços pertencem ao departamento, deverá haver uma opção para "cadastrar novos serviços" dentro das categorias (primeira coluna)
+
+2.	Geração de cronograma de entrega das obrigações/tarefas
+Deverá ter um espaço para informar o prazo de entrega  ou a periodicidade (diário, mensal, semanal, anual)
+
+3.	Posicionamento do colaborador no departamento / Avaliação individual
+Deverá ter um quadro com a soma dos pontos do colaborador, que aparece na linha 4 do excel (que é a soma dos números 1's informados nos quadros)
+
+4.	Identificação do grau de conhecimento em tarefas específicas de cada colaborador
+A variação entre preencher somente 1 campo ou 4 campos identificará o grau de conhecimento do colaborador,
+por exemplo, se eu tiver 3 colaboradores no nível 1  ( 1 de 4 níveis) não me adiantará muito, porque tenho 3 aprendizes e nenhum especialista.
+
+5.	Motivação para troca de conhecimentos, identificando quem conhece e quem gostaria de conhecer a execução da tarefa
+Os colaboradores poderão ver os quadros dos outros para poder ter o incentivo de querer saber o que o outro sabe e alcançar o score do seu colega e ainda, saber quem sabe para poder pedir ajuda e aprender.
+
+6.	Gerador de desempenho do colaborador ao longo do período
+Eu congelo a planilha a cada mês e copio ela para o mês seguinte, para poder comparar o que cada colaborador sabia e o que ele aprendeu quando ele preencheu novos conhecimentos na planilha nova.
+
+7.	Identificação de risco em caso de desligamento ou ausência temporária
+Quando eu pensar em desligar algum colaborador eu posso simplesmente simular a ausência dos pontos desse colaborador na planilha para saber em qual ponto crítico eu estarei quando fizer o desligamento de alguém.
+
+8.	Ferramenta base para adequação/promoção/desligamento do colaborador
+Cada colaborador poderá ser avaliado de acordo com o desempenho mostrado no item 6, assim o gestor não fará conclusões "próprias" para promover ou negar promoção para algum colaborador.
+
+9.	Indicador de riscos a partir da visão "da empresa" e não apenas do gestor, a partir da consolidação das informações.
+Nas colunas de AL até AP as analises podem ser feitas por setor, para poder identificar os quadros mais críticos, no exemplo que eu mandei o serviço de "obrigações acessórias" está mais crítico e o serviço de "Recebimento" esta numa situação bem mais confortável.
+
+
+
+
