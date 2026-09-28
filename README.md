@@ -81,11 +81,14 @@ curva de evolução de cada pessoa.
 
 ## Estado do projeto
 
-A ferramenta nasceu como planilha e está em processo de virar aplicação web multiusuário,
-rodando na rede interna da empresa.
+A ferramenta nasceu como planilha e está virando aplicação web multiusuário. A aplicação
+já existe e roda: matriz editável, painel de risco, simulador de ausência e tela de
+evolução, sobre PostgreSQL. Falta login, virada de mês pela interface e o deploy no
+servidor — **`ESTADO-DO-PROJETO.md` tem o inventário completo e o ponto de retomada.**
 
 | Arquivo | Conteúdo |
 |---|---|
+| `ESTADO-DO-PROJETO.md` | **Onde o projeto está e por onde continuar** — o que já foi construído, o que falta, decisões tomadas e perguntas em aberto |
 | `documentacao-semaforo-de-polivalencia.md` | Documentação funcional da planilha atual — regras de negócio, catálogo de tarefas e inconsistências mapeadas |
 | `arquitetura-semaforo-de-polivalencia.md` | Decisões de arquitetura e plano de construção do sistema |
 | `Semáforo de Polivalência - v2.xlsx` | A planilha em uso, que serve de especificação |

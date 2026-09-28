@@ -1,0 +1,15 @@
+# Troque pelo nome interno do servidor. Com um nome que resolva na rede da
+# empresa e um certificado interno, o Caddy cuida do TLS sozinho.
+#
+# Para começar sem certificado, use:  http://semaforo.interno {
+semaforo.interno {
+	reverse_proxy app:3000
+
+	encode gzip
+
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy same-origin
+	}
+}

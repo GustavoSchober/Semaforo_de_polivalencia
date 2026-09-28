@@ -1,0 +1,74 @@
+# Topologia da seção 14.1: três contêineres, e SÓ o proxy publica porta.
+# O Postgres não é alcançável de fora do host — metade da segurança do sistema,
+# e é de graça.
+#
+# Roda igual com Docker ou com Podman (`docker compose` aqui aponta para o
+# Podman via podman-docker).
+
+services:
+  postgres:
+    image: docker.io/library/postgres:17
+    environment:
+      POSTGRES_DB: semaforo
+      POSTGRES_USER: semaforo_app
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    # sem "ports": o banco não é alcançável de fora
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U semaforo_app -d semaforo']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL_FILE: /run/secrets/database_url
+      AUTH_SECRET_FILE: /run/secrets/auth_secret
+      NODE_ENV: production
+    secrets:
+      - database_url
+      - auth_secret
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    # sem "ports": só o Caddy alcança a aplicação
+
+  caddy:
+    image: docker.io/library/caddy:2
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddydata:/data
+      - caddyconfig:/config
+    depends_on:
+      - app
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        # sem rotação, o disco enche por causa de log antes de encher por dado
+        max-size: '10m'
+        max-file: '5'
+
+secrets:
+  db_password:
+    file: ./secrets/db_password
+  database_url:
+    file: ./secrets/database_url
+  auth_secret:
+    file: ./secrets/auth_secret
+
+volumes:
+  pgdata:
+  caddydata:
+  caddyconfig:

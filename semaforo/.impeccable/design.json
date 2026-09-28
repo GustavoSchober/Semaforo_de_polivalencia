@@ -1,0 +1,433 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-28T12:00:00Z",
+  "title": "Design System: Semáforo de Polivalência",
+  "extensions": {
+    "colorMeta": {
+      "flap": {
+        "role": "neutral",
+        "displayName": "Flap Black",
+        "canonical": "#0d0d0f",
+        "tonalRamp": ["#050506", "#0d0d0f", "#17171a", "#232328", "#3a3a41", "#5c5c66", "#8e8e98", "#c9c9d0"]
+      },
+      "flap-sombra": {
+        "role": "neutral",
+        "displayName": "Flap Shadow",
+        "canonical": "#1b1b1e",
+        "tonalRamp": ["#0a0a0b", "#131315", "#1b1b1e", "#2a2a2f", "#43434a", "#66666f", "#98989f", "#cdcdd2"]
+      },
+      "flap-alto": {
+        "role": "neutral",
+        "displayName": "Flap Highlight",
+        "canonical": "#26262b",
+        "tonalRamp": ["#0c0c0e", "#18181b", "#26262b", "#36363d", "#4e4e57", "#72727d", "#a1a1ab", "#d3d3d9"]
+      },
+      "flap-borda": {
+        "role": "neutral",
+        "displayName": "Hinge Black",
+        "canonical": "#000000",
+        "tonalRamp": ["#000000", "#0a0a0a", "#141414", "#232323", "#3b3b3b", "#5e5e5e", "#909090", "#cacaca"]
+      },
+      "tinta": {
+        "role": "neutral",
+        "displayName": "Painted Ink",
+        "canonical": "#f2f2f2",
+        "tonalRamp": ["#232323", "#3b3b3b", "#5e5e5e", "#828282", "#a6a6a6", "#c8c8c8", "#f2f2f2", "#fbfbfb"]
+      },
+      "tinta-fraca": {
+        "role": "neutral",
+        "displayName": "Weak Ink",
+        "canonical": "#9a9aa2",
+        "tonalRamp": ["#1e1e21", "#33333a", "#4c4c54", "#676770", "#83838c", "#9a9aa2", "#c0c0c6", "#e4e4e8"]
+      },
+      "ambar": {
+        "role": "primary",
+        "displayName": "Signal Amber",
+        "canonical": "#ffb400",
+        "tonalRamp": ["#3a2800", "#5a3d00", "#7d5500", "#a16d00", "#c68700", "#eba200", "#ffb400", "#ffd684"]
+      },
+      "ambar-chapa": {
+        "role": "primary",
+        "displayName": "Plate Amber",
+        "canonical": "#3d2900",
+        "tonalRamp": ["#1c1200", "#2b1c00", "#3d2900", "#5a3d00", "#7d5500", "#a97300", "#d69200", "#ffc84d"]
+      },
+      "vermelho": {
+        "role": "primary",
+        "displayName": "Signal Red",
+        "canonical": "#d32f2f",
+        "tonalRamp": ["#3a0c0c", "#561414", "#751c1c", "#962424", "#b72a2a", "#d32f2f", "#e96a63", "#f6b4ae"]
+      },
+      "vermelho-tinta": {
+        "role": "primary",
+        "displayName": "Legible Red",
+        "canonical": "#ff5a52",
+        "tonalRamp": ["#44100d", "#621815", "#83211c", "#a52b24", "#c8362d", "#e84639", "#ff5a52", "#ffada7"]
+      },
+      "verde": {
+        "role": "secondary",
+        "displayName": "Lamp Green",
+        "canonical": "#3fbf6f",
+        "tonalRamp": ["#0b2d19", "#124427", "#1a5c35", "#227544", "#2b8e53", "#34a761", "#3fbf6f", "#96e0b3"]
+      },
+      "aco": {
+        "role": "tertiary",
+        "displayName": "Brushed Steel",
+        "canonical": "#b6bbc2",
+        "tonalRamp": ["#1e2024", "#31343a", "#474b52", "#5f646c", "#7d838c", "#9aa0a8", "#b6bbc2", "#e0e3e7"]
+      },
+      "aco-escuro": {
+        "role": "tertiary",
+        "displayName": "Shadow Steel",
+        "canonical": "#7d838c",
+        "tonalRamp": ["#15171a", "#24272b", "#35393f", "#494e55", "#5f646c", "#7d838c", "#a3a9b1", "#d6d9dd"]
+      },
+      "aco-fundo": {
+        "role": "tertiary",
+        "displayName": "Steel Ground",
+        "canonical": "#2a2c31",
+        "tonalRamp": ["#0e0f11", "#1a1b1e", "#2a2c31", "#3c3f45", "#53575f", "#6f747d", "#9aa0a8", "#cfd3d8"]
+      },
+      "claro-flap": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "#eeeeea",
+        "tonalRamp": ["#1e1e1c", "#33332f", "#4d4d48", "#6b6b65", "#8f8f88", "#b4b4ad", "#d6d6d1", "#eeeeea"]
+      },
+      "claro-flap-sombra": {
+        "role": "neutral",
+        "displayName": "Cell Shade",
+        "canonical": "#e3e3de",
+        "tonalRamp": ["#1c1c1a", "#31312e", "#4a4a46", "#666661", "#8a8a84", "#adada7", "#cfcfc9", "#e3e3de"]
+      },
+      "claro-flap-alto": {
+        "role": "neutral",
+        "displayName": "Printed Cell",
+        "canonical": "#f8f8f6",
+        "tonalRamp": ["#1f1f1e", "#353532", "#50504c", "#6e6e69", "#93938c", "#b8b8b1", "#dcdcd6", "#f8f8f6"]
+      },
+      "claro-flap-borda": {
+        "role": "neutral",
+        "displayName": "Rule Grey",
+        "canonical": "#c6c6c0",
+        "tonalRamp": ["#1a1a18", "#2d2d2a", "#45453f", "#5f5f59", "#818179", "#a3a39c", "#c6c6c0", "#e8e8e3"]
+      },
+      "claro-tinta": {
+        "role": "neutral",
+        "displayName": "Press Ink",
+        "canonical": "#16171a",
+        "tonalRamp": ["#0a0a0c", "#16171a", "#242629", "#3a3c40", "#55585d", "#7b7e84", "#a8abb1", "#d8dade"]
+      },
+      "claro-tinta-fraca": {
+        "role": "neutral",
+        "displayName": "Faded Ink",
+        "canonical": "#56585d",
+        "tonalRamp": ["#0f1012", "#1d1e21", "#2e3034", "#424449", "#56585d", "#787b81", "#a4a7ad", "#d4d6da"]
+      },
+      "claro-ambar": {
+        "role": "primary",
+        "displayName": "Printed Amber",
+        "canonical": "#8a5500",
+        "tonalRamp": ["#251600", "#3d2900", "#573b00", "#714800", "#8a5500", "#b06e00", "#d68d1a", "#f5c775"]
+      },
+      "claro-vermelho": {
+        "role": "primary",
+        "displayName": "Printed Red",
+        "canonical": "#b3261e",
+        "tonalRamp": ["#2e0907", "#4a100d", "#671713", "#8a1e18", "#b3261e", "#cf4a41", "#e5837c", "#f6c3bf"]
+      },
+      "claro-vermelho-tinta": {
+        "role": "primary",
+        "displayName": "Body Red",
+        "canonical": "#9c1f18",
+        "tonalRamp": ["#280706", "#42100c", "#5d1712", "#7d1c16", "#9c1f18", "#bd4038", "#d97b74", "#f2bcb8"]
+      },
+      "claro-verde": {
+        "role": "secondary",
+        "displayName": "Printed Green",
+        "canonical": "#146b3f",
+        "tonalRamp": ["#04180e", "#082c1a", "#0d4327", "#115733", "#146b3f", "#1d8b53", "#3bb277", "#8fd8b2"]
+      },
+      "claro-aco": {
+        "role": "tertiary",
+        "displayName": "Printed Steel",
+        "canonical": "#4a4d53",
+        "tonalRamp": ["#0e0f11", "#1b1d20", "#2b2d31", "#3a3d42", "#4a4d53", "#6b6e75", "#9a9da4", "#cfd1d6"]
+      },
+      "claro-aco-escuro": {
+        "role": "tertiary",
+        "displayName": "Printed Shadow Steel",
+        "canonical": "#6b6e75",
+        "tonalRamp": ["#111214", "#1f2023", "#303338", "#42454b", "#565960", "#6b6e75", "#9b9ea5", "#d0d2d7"]
+      },
+      "claro-aco-fundo": {
+        "role": "tertiary",
+        "displayName": "Grey Ground",
+        "canonical": "#d8d8d3",
+        "tonalRamp": ["#1a1a18", "#2c2c2a", "#43433f", "#5d5d58", "#7e7e78", "#a0a09a", "#c2c2bc", "#d8d8d3"]
+      },
+      "claro-tarja": {
+        "role": "tertiary",
+        "displayName": "Masthead Band",
+        "canonical": "#23262b",
+        "tonalRamp": ["#0b0c0e", "#15171a", "#23262b", "#343840", "#4b505a", "#6b717d", "#9aa0aa", "#ced2d8"]
+      },
+      "claro-tarja-tinta": {
+        "role": "neutral",
+        "displayName": "Reversed Type",
+        "canonical": "#f2f2ef",
+        "tonalRamp": ["#232322", "#3b3b39", "#5e5e5b", "#82827e", "#a6a6a2", "#c8c8c4", "#f2f2ef", "#fbfbf9"]
+      },
+      "claro-regua": {
+        "role": "tertiary",
+        "displayName": "Printed Rule Band",
+        "canonical": "#dcdcd6",
+        "tonalRamp": ["#1b1b19", "#2e2e2b", "#464641", "#60605a", "#82827b", "#a4a49d", "#c6c6c0", "#dcdcd6"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Placa", "purpose": "The index page title inside the letreiro material. One screen only — it is the front door." },
+      "display-menor": { "displayName": "Placa Menor", "purpose": "Every other page title, inside the letreiro material. The working title size." },
+      "destaque": { "displayName": "Destaque", "purpose": "A single number or item name that must be read across a room: the risk panel's headline count, a task's own heading." },
+      "title": { "displayName": "Placa Chrome", "purpose": "Section headings, the masthead wordmark, the cycle label." },
+      "data": { "displayName": "Dado", "purpose": "Every numeral outside a flap. Tabular figures are set application-wide." },
+      "body": { "displayName": "Conteúdo", "purpose": "The 64 long Portuguese task descriptions, warning prose, explanatory paragraphs. Archivo at normal width, sentence case." },
+      "body-lead": { "displayName": "Conteúdo Guia", "purpose": "The lead paragraph under a page title. Same voice as body, one step up." },
+      "nota": { "displayName": "Nota", "purpose": "Subordinate prose in shadow steel: helper text under a field, a footnote under a table, a secondary line under a name." },
+      "campo": { "displayName": "Campo", "purpose": "Text typed into an input. One step above reading prose, because the person is aiming at it." },
+      "label": { "displayName": "Rótulo", "purpose": "Quiet chrome: field names, units, legends, inactive nav, ghost actions. Shadow steel." },
+      "label-strong": { "displayName": "Rótulo Forte", "purpose": "Names that must hold: person columns, department, active nav, chip labels, chart panel names." },
+      "estado": { "displayName": "Estado", "purpose": "The type inside a situation plate and the micro column legends over a data group. A state word, never a sentence." },
+      "tag": { "displayName": "Tag", "purpose": "The floor of the ramp: a bordered one-or-two-word status tag. Never prose, never a link, never the only carrier of a fact." }
+    },
+    "shadows": [
+      { "name": "flap-relief", "value": "inset 0 1px 0 rgba(255,255,255,0.07), 0 1px 2px rgba(0,0,0,0.6)", "purpose": "The lit lip and contact shadow of a flap at rest." },
+      { "name": "flap-relief-impresso", "value": "inset 0 0 0 1px rgba(0,0,0,0.14), 0 1px 0 rgba(0,0,0,0.05)", "purpose": "The same flap in print: a ruled box, not a lit plate." },
+      { "name": "flap-vazia", "value": "inset 0 0 0 1px rgba(125,131,140,0.34)", "purpose": "A flap that has never been flipped: a steel-channel outline instead of a lit lip." },
+      { "name": "flap-vazia-impresso", "value": "inset 0 0 0 1px rgba(107,110,117,0.45)", "purpose": "The empty cell on paper: same shadow-steel hue at a higher alpha, because a hairline on paper needs more ink to survive. Fill drops to a flat #e9e9e4." },
+      { "name": "junta", "value": "0 1px 0 rgba(255,255,255,0.035)", "purpose": "The seam under the 1px black hairline between two rows of flaps. Dropped in print; the border becomes 14% black." },
+      { "name": "lampada-verde", "value": "0 0 0 1px rgba(0,0,0,0.8), 0 0 7px rgba(63,191,111,0.55)", "purpose": "A green status lamp seated in the panel and emitting. In print: 0 0 0 1px rgba(0,0,0,.3), 0 0 5px rgba(20,107,63,.35)." },
+      { "name": "lampada-ambar", "value": "0 0 0 1px rgba(0,0,0,0.8), 0 0 7px rgba(255,180,0,0.6)", "purpose": "An amber status lamp. In print: 0 0 0 1px rgba(0,0,0,.3), 0 0 5px rgba(138,85,0,.35)." },
+      { "name": "lampada-vermelha", "value": "0 0 0 1px rgba(0,0,0,0.8), 0 0 8px rgba(211,47,47,0.65)", "purpose": "A red status lamp. In print: 0 0 0 1px rgba(0,0,0,.3), 0 0 5px rgba(179,38,30,.4)." },
+      { "name": "rebite", "value": "0 1px 2px rgba(0,0,0,.5), inset 0 -1px 1px rgba(0,0,0,.25)", "purpose": "The dome of a steel rivet on the masthead and rails." },
+      { "name": "letreiro-lip", "value": "inset 0 1px 0 rgba(255,255,255,0.05)", "purpose": "The top lip of the title material's cell grid. In print it becomes a full inset hairline at 10% black." }
+    ],
+    "motion": [
+      { "name": "virar", "value": "120ms cubic-bezier(0.32, 0, 0.67, 0)", "purpose": "One step of the flap cascade: rotateX(0 → -180deg) on a center-bottom origin, brightness spiking at 49% and dropping at 50% as the face passes the hinge." },
+      { "name": "passo-cascata", "value": "95ms", "purpose": "The interval between intermediate values while a flap rolls from its old value to the new one." },
+      { "name": "acender", "value": "260ms cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Opacity 0.25 → 1 on content revealed by a flip, and on the Explicação popover as it opens." },
+      { "name": "estado-controle", "value": "120–150ms ease-out", "purpose": "Colour and border transitions on controls (field border, ghost button, nav tab, chip). A state change, not a motion moment." },
+      { "name": "atraso-fechamento", "value": "120ms", "purpose": "The delay before a hover-opened popover closes, covering the gap between trigger and panel." },
+      { "name": "reduced-motion", "value": "animation: none; transition-duration: 0.01ms", "purpose": "Under prefers-reduced-motion the flap performs a dry swap and all transitions collapse." }
+    ],
+    "breakpoints": [
+      { "name": "md", "value": "48rem" }
+    ],
+    "themes": [
+      {
+        "name": "escuro",
+        "displayName": "Painel",
+        "selector": ":root (default)",
+        "purpose": "The departures board: lit, gradient, bloom, brushed sheen. The default and the identity."
+      },
+      {
+        "name": "claro",
+        "displayName": "Impresso",
+        "selector": ":root[data-tema=\"claro\"]",
+        "purpose": "The printed timetable: the station's other artefact, not the board inverted. Ruled cells, a solid ink masthead with reversed type, a grey rule band, a 1-in-3px paper grain at 1.2% black, and every risk pigment darkened for paper. Persisted in localStorage under semaforo:tema and applied by a synchronous script that is the first child of <body>."
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Flap",
+      "kind": "custom",
+      "refersTo": "palheta",
+      "description": "The atomic unit of the board: a two-tone plate with a hinge line across its middle, carrying one glyph.",
+      "html": "<span class=\"ds-flap\">3</span>",
+      "css": ".ds-flap { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 34px; font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'wdth' 70, 'wght' 600; font-variant-numeric: tabular-nums; font-size: 17px; line-height: 1; color: #f2f2f2; border-radius: 2px; user-select: none; background-image: linear-gradient(180deg, #26262b 0%, #191a1e 48.5%, rgba(0,0,0,0.9) 48.5%, rgba(0,0,0,0.9) 51.5%, #121316 51.5%, #1b1b1e 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.07), 0 1px 2px rgba(0,0,0,0.6); }"
+    },
+    {
+      "name": "Empty Flap",
+      "kind": "custom",
+      "refersTo": "palheta-vazia",
+      "description": "A flap that has never been flipped. Not a zero — the absence of an answer, marked in the confidence channel.",
+      "html": "<span class=\"ds-flap-empty\">–</span>",
+      "css": ".ds-flap-empty { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 34px; font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'wdth' 70, 'wght' 600; font-variant-numeric: tabular-nums; font-size: 17px; line-height: 1; color: #7d838c; border-radius: 2px; background-image: linear-gradient(180deg, #17181c 0%, #141519 48.5%, rgba(0,0,0,0.9) 48.5%, rgba(0,0,0,0.9) 51.5%, #101114 51.5%, #131417 100%); box-shadow: inset 0 0 0 1px rgba(125,131,140,0.34); }"
+    },
+    {
+      "name": "Printed Cell (light theme flap)",
+      "kind": "custom",
+      "refersTo": "palheta",
+      "description": "The same flap in the printed timetable: a cell ruled on paper with the hinge reduced to a 16% crease. The world crossing materials, not inverting.",
+      "html": "<span class=\"ds-flap-print\">3</span><span class=\"ds-flap-print ds-flap-print-empty\">–</span>",
+      "css": ".ds-flap-print { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 34px; margin-right: 4px; font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'wdth' 70, 'wght' 600; font-variant-numeric: tabular-nums; font-size: 17px; line-height: 1; color: #16171a; border-radius: 2px; background-image: linear-gradient(180deg, #ffffff 0%, #fbfbf9 48.5%, rgba(0,0,0,0.16) 48.5%, rgba(0,0,0,0.16) 51.5%, #f6f6f3 51.5%, #f1f1ee 100%); box-shadow: inset 0 0 0 1px rgba(0,0,0,0.14), 0 1px 0 rgba(0,0,0,0.05); } .ds-flap-print-empty { color: #6b6e75; background-image: none; background-color: #e9e9e4; box-shadow: inset 0 0 0 1px rgba(107,110,117,0.45); }"
+    },
+    {
+      "name": "Editable Matrix Cell",
+      "kind": "custom",
+      "refersTo": "palheta",
+      "description": "A flap wrapped in the spinbutton affordance: click advances a level and wraps at 4, shift-click reverses, keys 0–4 set directly.",
+      "html": "<div class=\"ds-cell\" role=\"spinbutton\" tabindex=\"0\" aria-valuenow=\"3\" aria-valuemin=\"0\" aria-valuemax=\"4\"><span class=\"ds-cell-flap\">3</span></div>",
+      "css": ".ds-cell { display: inline-flex; border-radius: 3px; outline: none; cursor: pointer; } .ds-cell-flap { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 30px; font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'wdth' 70, 'wght' 600; font-variant-numeric: tabular-nums; font-size: 15px; line-height: 1; color: #f2f2f2; border-radius: 2px; background-image: linear-gradient(180deg, #26262b 0%, #191a1e 48.5%, rgba(0,0,0,0.9) 48.5%, rgba(0,0,0,0.9) 51.5%, #121316 51.5%, #1b1b1e 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.07), 0 1px 2px rgba(0,0,0,0.6); } .ds-cell:hover .ds-cell-flap { filter: brightness(1.35); } .ds-cell:focus-visible { outline: 2px solid #ffb400; outline-offset: 2px; }"
+    },
+    {
+      "name": "Situation Plate",
+      "kind": "chip",
+      "refersTo": "placa-situacao-amarela",
+      "description": "The board's ON TIME / DELAYED / CANCELLED equivalent. Four states; green is outlined with a lamp, amber and red get the full plate.",
+      "html": "<span class=\"ds-plate ds-plate-green\"><span class=\"ds-lamp ds-lamp-green\"></span>COBERTA</span> <span class=\"ds-plate ds-plate-amber\">BACKUP 2</span> <span class=\"ds-plate ds-plate-red\">NINGUÉM</span> <span class=\"ds-plate ds-plate-red-hollow\">SÓ 1 PESSOA</span>",
+      "css": ".ds-plate { display: inline-flex; align-items: center; gap: 8px; padding: 4px 8px; font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-size: 10px; line-height: 1; text-transform: uppercase; border-radius: 0; } .ds-plate-green { font-variation-settings: 'wdth' 70, 'wght' 700; letter-spacing: 0.16em; color: #f2f2f2; border: 1px solid rgba(125,131,140,0.45); } .ds-plate-amber, .ds-plate-red, .ds-plate-red-hollow { font-variation-settings: 'wdth' 70, 'wght' 800; letter-spacing: 0.22em; } .ds-plate-amber { background: #ffb400; color: #0d0d0f; } .ds-plate-red { background: #d32f2f; color: #f2f2f2; } .ds-plate-red-hollow { border: 1px solid #d32f2f; color: #ff5a52; } .ds-lamp { display: inline-block; width: 6px; height: 6px; border-radius: 9999px; } .ds-lamp-green { background: #3fbf6f; box-shadow: 0 0 0 1px rgba(0,0,0,0.8), 0 0 7px rgba(63,191,111,0.55); }"
+    },
+    {
+      "name": "Mode Navigation",
+      "kind": "nav",
+      "refersTo": "nav-modo",
+      "description": "The six routes are modes of one board. Dark-steel band of square tabs; the active tab drops to flap black and goes amber, reading as a flap that has flipped open. Wraps rather than clips.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Modos do painel\"><ul><li><a class=\"ds-nav-tab ds-nav-tab-active\" aria-current=\"page\" href=\"#\"><svg viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"square\" stroke-linejoin=\"miter\" aria-hidden=\"true\"><path d=\"M2 2.75h12v10.5H2z\"/><path d=\"M2 6.25h12M2 9.75h12M6.5 2.75v10.5M11 2.75v10.5\"/></svg>Matriz</a></li><li><a class=\"ds-nav-tab\" href=\"#\"><svg viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"square\" stroke-linejoin=\"miter\" aria-hidden=\"true\"><path d=\"M2 3.25h12M2 8h12M2 12.75h12\"/><circle cx=\"12\" cy=\"8\" r=\"1.75\" fill=\"currentColor\" stroke=\"none\"/></svg>Painel de risco</a></li><li><a class=\"ds-nav-tab\" href=\"#\"><svg viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"square\" stroke-linejoin=\"miter\" aria-hidden=\"true\"><path d=\"M2.75 2.75h10.5v10.5H2.75z\"/><path d=\"M5.5 6h5M5.5 9h3\"/></svg>Gerenciar</a></li></ul></nav>",
+      "css": ".ds-nav { display: flex; border-bottom: 1px solid #000; background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 4px), linear-gradient(180deg, #3a3d44 0%, #2a2c31 55%, #202225 100%); } .ds-nav ul { display: flex; flex-wrap: wrap; margin: 0; padding: 0; list-style: none; } .ds-nav-tab { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-right: 1px solid rgba(0,0,0,0.6); text-decoration: none; font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-size: 11px; line-height: 1; text-transform: uppercase; letter-spacing: 0.16em; font-variation-settings: 'wdth' 70, 'wght' 600; color: #b6bbc2; transition: background-color .15s, color .15s; } .ds-nav-tab:hover { background: rgba(0,0,0,0.25); color: #f2f2f2; } .ds-nav-tab:focus-visible { outline: 2px solid #ffb400; outline-offset: 2px; } .ds-nav-tab-active { background: #0d0d0f; color: #ffb400; font-variation-settings: 'wdth' 70, 'wght' 700; }"
+    },
+    {
+      "name": "Field",
+      "kind": "input",
+      "refersTo": "campo",
+      "description": "A blank flap waiting to be written: flap-shadow ground, shadow-steel hairline, the flap's 2px corner. On focus the amber border is the focus ring.",
+      "html": "<label class=\"ds-field-label\" for=\"ds-f1\">Nome da tarefa</label><input id=\"ds-f1\" class=\"ds-field\" type=\"text\" placeholder=\"Emissão de NF-e\" /><label class=\"ds-field-label\" for=\"ds-f2\" style=\"margin-top:16px\">Setor</label><select id=\"ds-f2\" class=\"ds-field ds-field-select\"><option>Faturamento</option><option>Fiscal</option></select>",
+      "css": ".ds-field-label { display: block; font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'wdth' 70, 'wght' 600; text-transform: uppercase; letter-spacing: 0.16em; font-size: 11px; line-height: 1; color: #7d838c; margin-bottom: 8px; } .ds-field { display: block; width: 100%; background-color: #1b1b1e; color: #f2f2f2; border: 1px solid rgba(125,131,140,0.45); border-radius: 2px; padding: 8px 10px; font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'wdth' 100, 'wght' 400; font-size: 14px; line-height: 1.4; caret-color: #ffb400; transition: border-color 120ms ease-out; } .ds-field::placeholder { color: #7d838c; } .ds-field:hover { border-color: rgba(182,187,194,0.7); } .ds-field:focus { outline: none; border-color: #ffb400; } .ds-field-select { appearance: none; padding-right: 32px; background-image: linear-gradient(45deg, transparent 50%, #7d838c 50%), linear-gradient(135deg, #7d838c 50%, transparent 50%); background-position: calc(100% - 16px) calc(50% + 1px), calc(100% - 11.2px) calc(50% + 1px); background-size: 5px 5px; background-repeat: no-repeat; }"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "botao",
+      "description": "Amber fill, flap-black text, the flap's 2px corner. Amber is already this system's action colour, so the primary button needed no new pigment.",
+      "html": "<button type=\"button\" class=\"ds-btn\">Cadastrar tarefa</button> <button type=\"button\" class=\"ds-btn\" disabled>Gravando</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; gap: 10px; background-color: #ffb400; color: #0d0d0f; border: 1px solid #ffb400; border-radius: 2px; padding: 8px 15px; font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'wdth' 70, 'wght' 800; text-transform: uppercase; letter-spacing: 0.16em; font-size: 11px; cursor: pointer; transition: filter 120ms ease-out; } .ds-btn:hover { filter: brightness(1.12); } .ds-btn:focus-visible { outline: 2px solid #ffb400; outline-offset: 2px; } .ds-btn:disabled { opacity: 0.45; cursor: not-allowed; filter: none; }"
+    },
+    {
+      "name": "Ghost & Danger Button",
+      "kind": "button",
+      "refersTo": "botao-fantasma",
+      "description": "The bordered secondary pair: ghost goes amber on hover, danger is the same shape in the risk channel for destructive actions only.",
+      "html": "<button type=\"button\" class=\"ds-btn-ghost\">Cancelar</button> <button type=\"button\" class=\"ds-btn-ghost ds-btn-danger\">Remover do catálogo</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; gap: 10px; background: transparent; color: #f2f2f2; border: 1px solid rgba(125,131,140,0.45); border-radius: 2px; padding: 8px 15px; font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'wdth' 70, 'wght' 600; text-transform: uppercase; letter-spacing: 0.16em; font-size: 11px; cursor: pointer; transition: border-color 120ms ease-out, color 120ms ease-out; } .ds-btn-ghost:hover { border-color: #ffb400; color: #ffb400; } .ds-btn-ghost:focus-visible { outline: 2px solid #ffb400; outline-offset: 2px; } .ds-btn-danger { color: #ff5a52; border-color: rgba(211,47,47,0.55); } .ds-btn-danger:hover { border-color: #d32f2f; color: #ff5a52; background-color: rgba(211,47,47,0.12); }"
+    },
+    {
+      "name": "Roster Toggle Chip",
+      "kind": "chip",
+      "refersTo": "botao-alternar",
+      "description": "The simulator's absence toggle. The only control the risk channel is allowed to mark, because the control is the risk.",
+      "html": "<button type=\"button\" class=\"ds-chip\" aria-pressed=\"false\"><span class=\"ds-chip-name\">Pamella</span><span class=\"ds-chip-tag\">3 pend.</span></button> <button type=\"button\" class=\"ds-chip ds-chip-on\" aria-pressed=\"true\"><span class=\"ds-chip-name\">Maykon</span><span class=\"ds-chip-tag ds-chip-tag-on\">fora</span></button>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; gap: 12px; padding: 10px 14px; border: 1px solid rgba(125,131,140,0.45); border-radius: 0; background: transparent; color: #f2f2f2; cursor: pointer; transition: background-color .15s, border-color .15s, color .15s; } .ds-chip-name { font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-size: 11px; line-height: 1; text-transform: uppercase; letter-spacing: 0.16em; font-variation-settings: 'wdth' 70, 'wght' 700; } .ds-chip-tag { font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'wdth' 70, 'wght' 600; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: #7d838c; } .ds-chip:hover { border-color: #b6bbc2; background: #1b1b1e; } .ds-chip:focus-visible { outline: 2px solid #ffb400; outline-offset: 2px; } .ds-chip-on { border-color: #d32f2f; background: rgba(211,47,47,0.18); color: #ff5a52; } .ds-chip-tag-on { color: #ff5a52; }"
+    },
+    {
+      "name": "Service Warning Band",
+      "kind": "custom",
+      "refersTo": "aviso-servico",
+      "description": "One component, two tones. Steel (role=status) for a caveat that qualifies a number; red-ruled (role=alert) for a reading that could make someone decide wrongly. Severity, not category, picks the channel.",
+      "html": "<div role=\"status\" class=\"ds-warn\"><span class=\"ds-warn-icon\"><svg viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"square\" stroke-linejoin=\"miter\" aria-hidden=\"true\"><path d=\"M8 1.75 15 14.25H1z\"/><path d=\"M8 6v4M8 12.25v.5\"/></svg></span><p class=\"ds-warn-text\"><strong class=\"ds-warn-title\">Sem autenticação</strong>A sessão está fixa em Alexandre (gestor).</p></div><div role=\"alert\" class=\"ds-warn ds-warn-alert\"><span class=\"ds-warn-icon\"><svg viewBox=\"0 0 16 16\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"square\" stroke-linejoin=\"miter\" aria-hidden=\"true\"><path d=\"M8 1.75 15 14.25H1z\"/><path d=\"M8 6v4M8 12.25v.5\"/></svg></span><p class=\"ds-warn-text\"><strong class=\"ds-warn-title\">Esta simulação não é confiável</strong>63 células ainda não foram avaliadas: o painel abaixo subestima o risco.</p></div>",
+      "css": ".ds-warn { display: flex; align-items: baseline; gap: 12px; padding: 10px 20px; border-bottom: 1px solid #000; background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 4px), linear-gradient(180deg, #3a3d44 0%, #2a2c31 55%, #202225 100%); } .ds-warn-icon { align-self: flex-start; transform: translateY(2px); color: #b6bbc2; } .ds-warn-text { margin: 0; max-width: 110ch; font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'wdth' 100, 'wght' 400; font-size: 13px; line-height: 1.625; color: #b6bbc2; } .ds-warn-title { margin-right: 10px; font-variation-settings: 'wdth' 70, 'wght' 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.16em; color: #f2f2f2; } .ds-warn-alert { background-image: none; background-color: rgba(211,47,47,0.12); border-left: 2px solid #d32f2f; } .ds-warn-alert .ds-warn-icon, .ds-warn-alert .ds-warn-text, .ds-warn-alert .ds-warn-title { color: #ff5a52; }"
+    },
+    {
+      "name": "Explicação Popover",
+      "kind": "custom",
+      "refersTo": "explicacao-painel",
+      "description": "The count that names its people. Opens on hover, on click/touch and on focus; closes on Escape and outside pointer. role=tooltip, never a modal.",
+      "html": "<span class=\"ds-exp\"><button type=\"button\" class=\"ds-exp-trigger\" aria-expanded=\"true\" aria-controls=\"ds-exp-panel\">3 <span class=\"ds-exp-unit\">sozinho</span></button><span id=\"ds-exp-panel\" role=\"tooltip\" class=\"ds-exp-panel\"><span class=\"ds-exp-title\">Quem opera sozinho</span><span class=\"ds-exp-row\"><span class=\"ds-exp-name\">Alexandre</span><span class=\"ds-exp-note\">nível 3</span></span><span class=\"ds-exp-row\"><span class=\"ds-exp-name\">Luis</span><span class=\"ds-exp-note\">nível 3 · herdado</span></span></span></span>",
+      "css": ".ds-exp { position: relative; display: inline-flex; } .ds-exp-trigger { display: inline-flex; align-items: center; gap: 6px; padding: 2px 4px; border: none; border-radius: 2px; background: transparent; cursor: pointer; font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'wdth' 70, 'wght' 600; font-variant-numeric: tabular-nums; font-size: 17px; color: #f2f2f2; transition: color .15s; } .ds-exp-trigger:hover, .ds-exp-trigger[aria-expanded=\"true\"] { color: #ffb400; } .ds-exp-trigger:focus-visible { outline: 2px solid #ffb400; outline-offset: 2px; } .ds-exp-unit { font-size: 11px; text-transform: uppercase; letter-spacing: 0.16em; color: #7d838c; } .ds-exp-panel { position: absolute; top: 100%; left: 0; z-index: 50; display: block; min-width: 15rem; margin-top: 6px; padding: 12px; background: #1b1b1e; border: 1px solid rgba(125,131,140,0.6); } .ds-exp-title { display: block; margin-bottom: 8px; font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'wdth' 70, 'wght' 600; font-size: 11px; line-height: 1; text-transform: uppercase; letter-spacing: 0.16em; color: #7d838c; } .ds-exp-row { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 3px 0; } .ds-exp-name { font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'wdth' 100, 'wght' 400; font-size: 13px; color: #f2f2f2; } .ds-exp-note { font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'wdth' 70, 'wght' 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.16em; white-space: nowrap; color: #7d838c; }"
+    },
+    {
+      "name": "Disclosure Drawer",
+      "kind": "custom",
+      "refersTo": "botao-fantasma",
+      "description": "Native <details> with the ghost button as its summary. No JavaScript, keyboard-operable by definition, a server component on purpose.",
+      "html": "<details class=\"ds-drawer\" open><summary class=\"ds-drawer-summary\">Cadastrar colaborador</summary><div class=\"ds-drawer-panel\"><span class=\"ds-drawer-hint\">O formulário fecha a gaveta sozinho quando grava.</span></div></details>",
+      "css": ".ds-drawer-summary { display: inline-flex; align-items: center; gap: 10px; list-style: none; background: transparent; color: #f2f2f2; border: 1px solid rgba(125,131,140,0.45); border-radius: 2px; padding: 8px 15px; font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'wdth' 70, 'wght' 600; text-transform: uppercase; letter-spacing: 0.16em; font-size: 11px; cursor: pointer; transition: border-color 120ms ease-out, color 120ms ease-out; } .ds-drawer-summary::-webkit-details-marker { display: none; } .ds-drawer-summary:hover { border-color: #ffb400; color: #ffb400; } .ds-drawer[open] .ds-drawer-summary { border-color: #ffb400; color: #ffb400; } .ds-drawer-panel { margin-top: 12px; padding: 20px; border: 1px solid rgba(125,131,140,0.45); background: #1b1b1e; } .ds-drawer-hint { font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'wdth' 100, 'wght' 400; font-size: 13px; line-height: 1.625; color: #b6bbc2; }"
+    },
+    {
+      "name": "Theme Switch",
+      "kind": "custom",
+      "refersTo": "troca-tema",
+      "description": "Two artefacts, not a theme and its negative — so the labels say Painel and Impresso. Sits on the masthead and inherits its ink through the steel remap.",
+      "html": "<div role=\"group\" aria-label=\"Aparência\" class=\"ds-theme\"><button type=\"button\" class=\"ds-theme-btn ds-theme-btn-on\" aria-pressed=\"true\" title=\"Painel de partidas — fundo escuro\">Painel</button><button type=\"button\" class=\"ds-theme-btn\" aria-pressed=\"false\" title=\"Folha de horários — tinta sobre papel\">Impresso</button></div>",
+      "css": ".ds-theme { display: inline-flex; align-items: center; gap: 1px; padding: 1px; border: 1px solid rgba(242,242,242,0.25); color: #f2f2f2; } .ds-theme-btn { padding: 4px 8px; border: none; background: transparent; cursor: pointer; font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'wdth' 70, 'wght' 700; text-transform: uppercase; letter-spacing: 0.16em; font-size: 9px; line-height: 1; color: currentColor; opacity: 0.6; transition: opacity .15s, background-color .15s, color .15s; } .ds-theme-btn:hover { opacity: 1; } .ds-theme-btn:focus-visible { outline: 2px solid #ffb400; outline-offset: 2px; } .ds-theme-btn-on { opacity: 1; background: rgba(242,242,242,0.9); color: #0d0d0f; }"
+    },
+    {
+      "name": "Coverage Counter",
+      "kind": "custom",
+      "refersTo": "palheta",
+      "description": "The goal as a container with visible capacity: digits on flaps over a track that fills to the labelled three-people mark, never a bare percentage.",
+      "html": "<div class=\"ds-counter\"><span class=\"ds-counter-label\">Cobertura do departamento</span><span class=\"ds-counter-digits\"><span class=\"ds-counter-flap\">7</span><span class=\"ds-counter-flap\">6</span><span class=\"ds-counter-mark\">,</span><span class=\"ds-counter-flap\">0</span><span class=\"ds-counter-flap\">4</span><span class=\"ds-counter-mark\">%</span></span><span class=\"ds-counter-row\"><span class=\"ds-counter-track\"><span class=\"ds-counter-fill\" style=\"width:76%\"></span></span><span class=\"ds-counter-label\">meta 3 pessoas</span></span></div>",
+      "css": ".ds-counter { display: flex; flex-direction: column; gap: 8px; } .ds-counter-label { font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-size: 11px; line-height: 1; text-transform: uppercase; letter-spacing: 0.16em; font-variation-settings: 'wdth' 70, 'wght' 600; color: #7d838c; white-space: nowrap; } .ds-counter-digits { display: flex; align-items: flex-end; gap: 1px; } .ds-counter-flap { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 40px; font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'wdth' 70, 'wght' 600; font-variant-numeric: tabular-nums; font-size: 20px; line-height: 1; color: #f2f2f2; border-radius: 2px; background-image: linear-gradient(180deg, #26262b 0%, #191a1e 48.5%, rgba(0,0,0,0.9) 48.5%, rgba(0,0,0,0.9) 51.5%, #121316 51.5%, #1b1b1e 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.07), 0 1px 2px rgba(0,0,0,0.6); } .ds-counter-mark { padding-bottom: 4px; font-family: Archivo, ui-sans-serif, system-ui, sans-serif; font-variation-settings: 'wdth' 70, 'wght' 600; font-size: 15px; color: #9a9aa2; } .ds-counter-row { display: flex; align-items: center; gap: 8px; } .ds-counter-track { position: relative; display: block; width: 160px; height: 5px; overflow: hidden; background: #000; } .ds-counter-fill { position: absolute; inset: 0 auto 0 0; background: #f2f2f2; transition: width .5s ease-out; }"
+    },
+    {
+      "name": "Steel Rail",
+      "kind": "custom",
+      "refersTo": "aviso-servico",
+      "description": "The riveted brushed-steel rail. Separates regions; never decorates. Its class remaps the ink tokens for anything placed on it.",
+      "html": "<div class=\"ds-rail\" aria-hidden=\"true\"><span class=\"ds-rivet ds-rivet-left\"></span><span class=\"ds-rivet ds-rivet-right\"></span></div>",
+      "css": ".ds-rail { position: relative; height: 10px; border-top: 1px solid #000; border-bottom: 1px solid #000; background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 1px, rgba(0,0,0,0.05) 1px 2px, transparent 2px 4px), linear-gradient(180deg, #dee2e7 0%, #c6cbd2 34%, #b2b8c0 62%, #a6acb5 82%, #9ba1aa 100%); } .ds-rivet { position: absolute; top: 50%; width: 8px; height: 8px; transform: translateY(-50%); border-radius: 9999px; background: radial-gradient(circle at 35% 30%, #f4f6f8 0%, #a8aeb6 45%, #565b63 100%); box-shadow: 0 1px 2px rgba(0,0,0,.5), inset 0 -1px 1px rgba(0,0,0,.25); } .ds-rivet-left { left: 12px; } .ds-rivet-right { right: 12px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Concourse Departures Board",
+    "overview": "This is a split-flap station board rendered as an operations tool. Every task in the department is a row on the board: it has a time (prazo), a destination (the task), a platform (the sector) and a situation that changes in front of everyone standing in the hall. The whole interface is built from one atom — the flap, a two-tone plate with a hinge line across its middle — and from one frame: a brushed-steel masthead carrying the wordmark, the cycle and the modes. The six routes are not six pages; they are modes of the same board.\n\nOne law runs through the stylesheet and holds in the shipped code: each visual property carries exactly one fact. A flipped flap is a level. A lamp is a farol. Steel is confidence in the data. Nothing is present because it looked better with it. That law is why the world can be this dark and this dense without becoming decorative noise — density is the point, since a single screen holds 64 task rows, five people and four level columns, and the manager reads it for an hour under office light.\n\nThe board now ships in two materials. The dark board is the default and the identity. Its second theme is not the board inverted: it is the printed timetable — the same station's other artefact, where the flap becomes a cell ruled on paper, the brushed masthead becomes a solid ink band with reversed type, and every risk pigment is remixed for paper. Lightening the departures board itself would dissolve the world; printing its timetable does not.\n\nThe scaffold it replaced (create-next-app) is the declared anti-reference, and so is the genre default this category always ships: sidebar, a row of KPI cards, a paginated table, a donut chart. A departures board does not report; it warns. The black ground is a user-pinned commitment, mitigated by craft rather than diluted — flap black instead of pure black, painted ink instead of pure white, and a generous 2.125rem line rhythm.",
+    "keyCharacteristics": [
+      "One atom (the flap) and one frame (the steel plate) generate nearly every surface.",
+      "Two colour channels that never mix by hue: risk (amber/red) and confidence (steel); severity, not category, decides which one a message gets.",
+      "Two materials, not a theme and its negative: the lit board and the printed timetable, each with its own pigments.",
+      "One typeface, Archivo, in two width axes — narrow for chrome and data, normal for prose.",
+      "Rectangular by law; the only round things are lamps and rivets, which are round objects.",
+      "One authored motion moment (the flap cascade); everything else is static by intent.",
+      "Charts are achromatic; direction is carried by slope, sign, arrow and hatch.",
+      "Every count is answerable: the number carries the names behind it."
+    ],
+    "rules": [
+      { "name": "The Two Channels Rule", "body": "Amber and red belong to the farol and say 'this is the risk'. Steel says something else entirely: 'this number is soft'. The two channels are separated by hue and by form — risk arrives as a filled or outlined plate on a row, or as a red-ruled band; confidence arrives as a full-width brushed band or an un-flipped flap.", "section": "colors" },
+      { "name": "The Severity Amendment", "body": "Amends The Two Channels Rule. Severity, not category, picks the channel. A caveat that merely qualifies a number is steel: AvisoDeServico at tom=\"servico\", role=\"status\". A caveat that could make someone decide wrongly — a simulation running over an incomplete matrix, a panel computed over missing cells — is the same component raised into the risk channel: tom=\"alerta\", a 2px red left rule, a 12% red wash, legible-red prose and role=\"alert\". There is no third visual system for it; one component carries both tones so no screen invents its own dialect. Everything the original rule bans still holds — a merely informative data-quality note is never amber and never red, and a farol risk is never steel.", "section": "colors" },
+      { "name": "The Green Lamp Rule", "body": "Green exists and is nameable, but it is a 6–7px lamp with a soft bloom, never a fill. On a board where most rows are healthy, a field of glowing green rows reads as nothing at all. Amber and red get the full plate treatment; green gets an outlined plate with a lamp in it.", "section": "colors" },
+      { "name": "The Steel Remap Rule", "body": "The steel classes redefine the ink and steel tokens for everything inside them. This is the system's contrast mechanism, not an implementation detail: anything dropped onto a steel plate is legible by default, and new components inherit that for free. Without it, shadow steel on light steel measures 1.7:1 and shadow steel on dark steel measures 3.66:1. The light theme re-runs the same mechanism with print values on the ink band and the rule band. Never hard-code a text colour on a steel surface — let the remap do it.", "section": "colors" },
+      { "name": "The Two Artefacts Rule", "body": "The light theme is not the board inverted; it is the station's other artefact. Any new surface must land in both materials as itself: on the board it is lit (gradient, bloom, brushed sheen), in print it is ruled (hairline box, flat fill, crease). The toggle's own labels say which artefact you are in — 'Painel' and 'Impresso', never 'claro' and 'escuro'.", "section": "colors" },
+      { "name": "The Channel Crossing Rule", "body": "Both channels survive the crossing, repigmented and never reassigned. Amber stays the warning, red stays the critical, steel stays the confidence channel, green stays a lamp — every one darkened for paper. Never solve a print contrast problem by moving a fact to a different channel.", "section": "colors" },
+      { "name": "The Achromatic Chart Rule", "body": "Charts in this system carry no hue. Green×red scored ΔE 4.2 under deuteranopia — below the floor — so direction is carried by four channels that survive colour blindness, a meeting-room projector and a black-and-white print: the slope of the line itself, a signed number, a drawn arrow, and a 45° hatch fill over the panel of anyone who regressed. Any future chart in this system inherits this rule; do not reintroduce colour as a direction channel.", "section": "colors" },
+      { "name": "The Two Widths Rule", "body": "Never add a second family. When something needs to feel different, move it along the width axis, not across families. Narrow + caps + tracking owns chrome, labels, states and data; normal width + sentence case owns content.", "section": "typography" },
+      { "name": "The Sentence Case Content Rule", "body": "Uppercase spaced lettering stops where content begins. An 80-character Portuguese task description in tracked caps is unreadable, and this was the declared translation when the world was chosen: the board's voice keeps the chrome, the reader keeps the prose.", "section": "typography" },
+      { "name": "The Floor of the Ramp Rule", "body": "0.5625rem is the bottom of this system and it is a tag step, not a text step. Anything smaller is out of the ramp. If new chrome does not fit at 0.5625rem in one or two tracked words, it is not a tag — give it label size and less text.", "section": "typography" },
+      { "name": "The Whole Document Scrolls Rule", "body": "The shell never locks the viewport. No h-dvh container with an internally scrolling region, no overflow-hidden on the app root, no position: sticky header depending on a measured shell height. The frame is a band at the top of a document, and the document is what scrolls. On a black ground a scrolled-away app is an empty screen, not a visible bug; this constraint is what keeps that failure from returning.", "section": "layout" },
+      { "name": "The Material Shadow Rule", "body": "A shadow is allowed only when it states a physical fact about the material it is on: the fold of a hinge, the lip of a flap, the bloom of a lamp, the dome of a rivet, the seam between rows. No hover lift, no elevation ramp, no offset shadow to separate a container from its background. If a new element wants separation, give it a hairline or a steel band — that is how the drawer panel and the popover are bounded.", "section": "elevation" },
+      { "name": "The One Moment Rule", "body": "This system has exactly one motion moment and it is the cascade. Everything else is static by intent. Colour/border state transitions on controls run at 120–150ms and are not moments. Do not add reveals, lifts or parallax; a departures board is still until a value changes.", "section": "components" },
+      { "name": "The Names Behind The Number Rule", "body": "'3 pessoas operam sozinhas' is half an answer: without the names nobody can request help, plan training or decide a replacement. Any aggregate this system shows must be able to name its members in place. If a count cannot be opened, it should not be the thing on screen.", "section": "components" },
+      { "name": "The Three Ways In Rule", "body": "Hover is never the only way in. Every disclosure opens on pointer hover and on click or touch and on focus, and closes on Escape and on an outside pointer. A treatment that only answers a mouse answers half the users.", "section": "components" }
+    ],
+    "dos": [
+      "Do make every visual property carry exactly one fact. A flipped flap is a level; a lamp is a farol; steel is confidence. If a treatment carries nothing, remove it.",
+      "Do keep the two channels apart by hue and by form, and pick the channel by severity: steel for a caveat, red for a reading that could make someone decide wrongly.",
+      "Do land every new surface in both artefacts — lit on the board, ruled in print — and repigment rather than rechannel when print contrast fails.",
+      "Do put text on steel and let the steel classes remap the ink tokens for you, rather than hard-coding a colour for that surface.",
+      "Do build numbers out of one flap per digit, so multi-digit values roll correctly instead of swapping dry.",
+      "Do keep field rhythm on the board line (2.125rem) and its divisors, and keep type on the shipped 1px ramp from 0.5625rem to 1.75rem.",
+      "Do let every count open onto the names behind it, and open it by hover and click/touch and focus.",
+      "Do keep the shell in normal page flow with min-h-dvh; let the document scroll.",
+      "Do carry direction in charts with slope, a signed number, an arrow and a hatch — four channels, none of them hue.",
+      "Do render icons as 16px SVG on a 1.5 stroke with square caps and mitred joins, and prefer a word to a pictogram: on a departures board almost everything is a word.",
+      "Do cap content measure (34rem in the grid, 46–92ch in prose, 110ch in warning bands) and set it in sentence case at normal width.",
+      "Do give a form control the flap's 2px corner and the flap-shadow ground, so a field reads as a plate waiting to be written."
+    ],
+    "donts": [
+      "Don't lock the shell to the viewport. No h-dvh root with an internally scrolling main, no overflow-hidden app container, no sticky header measured off a fixed shell — that combination scrolled the whole app off-screen and left a full-viewport black void.",
+      "Don't treat the light theme as an inversion. It has its own pigments, its own materials and its own name; a filter or a blanket lightening is not it.",
+      "Don't use cards. Regions are separated by steel bands and hairlines; a panel that needs bounding gets a border, never a floating shadow.",
+      "Don't add radius beyond the flap's 2px (shared by form controls), the 3px editable-cell wrapper, and objects that are physically round (lamps, rivets).",
+      "Don't add a shadow that isn't a material fact — no elevation ramp, no hover lift, no offset or ambient drop shadow behind a panel or popover.",
+      "Don't add a gradient that isn't a material: steel sheen, the flap's light/shade split at the hinge, a rivet dome, the select arrow, the paper grain. No decorative or brand gradients.",
+      "Don't stand a Unicode glyph or a bare letter in a circle in for an icon. Every icon is a drawn SVG from the 16px set.",
+      "Don't set type off the ramp. 1rem and 1.125rem are not steps in this system: a lead paragraph is 0.9375rem and a prominent numeral is 1.0625rem or 1.25rem. Nothing goes below 0.5625rem, and 0.5625rem is for tags only.",
+      "Don't introduce a second display face. Archivo in two width axes is the whole lettering system.",
+      "Don't use amber or red for a caveat that merely qualifies a number — that is the steel channel's job. Red is for a reading that could make someone decide wrongly.",
+      "Don't fill anything with green. Green is a lamp.",
+      "Don't let colour be the only channel for any state; the number, the word, or the shape must say it too.",
+      "Don't make hover the only way to reveal anything.",
+      "Don't add a second motion moment. The cascade is the only one.",
+      "Don't hard-code a hex in a component. Material definitions in globals.css own the literal values; components reference tokens."
+    ]
+  }
+}

@@ -1,0 +1,636 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Painel Split-Flap — o sistema visual do Semáforo de Polivalência.
+
+   Uma lei atravessa este arquivo: cada propriedade visual carrega exatamente um
+   dado. Palheta virada = nível. Lâmpada = farol. Aço = confiança no dado.
+   Nada aqui existe por decoração.
+
+   Os dois canais nunca se misturam:
+     RISCO      âmbar e vermelho, só onde a regra do farol dispara.
+     CONFIANÇA  aço, só onde o dado é incerto (não avaliado, não validado,
+                simulação sobre matriz incompleta, ciclo fechado).
+   --------------------------------------------------------------------------- */
+
+@theme {
+  /* Material da palheta */
+  --color-flap: #0d0d0f;
+  --color-flap-sombra: #1b1b1e;
+  --color-flap-alto: #26262b;
+  --color-flap-borda: #000000;
+
+  /* Tinta pintada na palheta — nunca branco puro, ele floresce no preto */
+  --color-tinta: #f2f2f2;
+  --color-tinta-fraca: #9a9aa2;
+
+  /* Canal de RISCO */
+  --color-ambar: #ffb400;
+  /* O mesmo âmbar traduzido para a chapa de aço clara: #ffb400 sobre ela mede
+     abaixo do piso, e o canal não pode mudar de identidade só porque mudou de
+     material. 5,3:1 na ponta escura da chapa, 10,6:1 na clara. */
+  --color-ambar-chapa: #3d2900;
+  --color-vermelho: #d32f2f;
+  --color-vermelho-tinta: #ff5a52; /* o vermelho legível em corpo de texto */
+  --color-verde: #3fbf6f;
+
+  /* Canal de CONFIANÇA — moldura e avisos de dado frágil */
+  --color-aco: #b6bbc2;
+  --color-aco-escuro: #7d838c;
+  --color-aco-fundo: #2a2c31;
+
+  --font-painel: var(--fonte-archivo), ui-sans-serif, system-ui, sans-serif;
+
+  /* Uma linha de painel. Tudo no campo é múltiplo ou divisor disto. */
+  --spacing-linha: 2.125rem;
+}
+
+:root {
+  color-scheme: dark;
+
+  /* Eixos de largura do Archivo. Uma família, dois usos:
+     estreita para cromagem e dados, normal para conteúdo longo. */
+  --wdth-estreita: 70;
+  --wdth-normal: 100;
+
+  --hinge: rgba(0, 0, 0, 0.9);
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  background: var(--color-flap);
+  color: var(--color-tinta);
+  font-family: var(--font-painel);
+  font-variation-settings: "wdth" var(--wdth-normal);
+  /* numeral tabular em toda a aplicação: uma coluna de níveis que dança
+     horizontalmente é uma coluna que não se lê */
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------------------------------------------------------------------
+   Superfícies do navegador. Elas também são o painel.
+   --------------------------------------------------------------------------- */
+
+::selection {
+  background: var(--color-ambar);
+  color: var(--color-flap);
+}
+
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-flap-borda);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-aco-escuro);
+  border: 2px solid var(--color-flap-borda);
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-aco);
+}
+::-webkit-scrollbar-corner {
+  background: var(--color-flap-borda);
+}
+* {
+  scrollbar-color: var(--color-aco-escuro) var(--color-flap-borda);
+  scrollbar-width: thin;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-ambar);
+  outline-offset: 2px;
+}
+
+input,
+textarea {
+  caret-color: var(--color-ambar);
+}
+
+::placeholder {
+  color: var(--color-aco-escuro);
+}
+
+/* ---------------------------------------------------------------------------
+   Lettering do painel.
+   Caixa alta espacejada fica com a cromagem, os estados e os rótulos.
+   Caixa de sentença fica com o conteúdo — 64 descrições de tarefa em versalete
+   espacejado seriam ilegíveis, e essa é a tradução declarada no contrato.
+   --------------------------------------------------------------------------- */
+
+.rotulo {
+  font-variation-settings: "wdth" var(--wdth-estreita), "wght" 600;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.6875rem;
+  line-height: 1;
+  color: var(--color-aco-escuro);
+}
+
+.rotulo-forte {
+  font-variation-settings: "wdth" var(--wdth-estreita), "wght" 700;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--color-tinta);
+}
+
+.placa {
+  font-variation-settings: "wdth" var(--wdth-estreita), "wght" 800;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+}
+
+.dado {
+  font-variation-settings: "wdth" var(--wdth-estreita), "wght" 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.conteudo {
+  font-variation-settings: "wdth" var(--wdth-normal), "wght" 400;
+}
+
+/* ---------------------------------------------------------------------------
+   Materiais.
+   --------------------------------------------------------------------------- */
+
+/* Aço escovado — a única superfície da interface com gradiente, e a única com
+   textura. Separa regiões; nunca decora. */
+.aco {
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.05) 0 1px,
+      rgba(0, 0, 0, 0.05) 1px 2px,
+      transparent 2px 4px
+    ),
+    linear-gradient(
+      180deg,
+      #dee2e7 0%,
+      #c6cbd2 34%,
+      #b2b8c0 62%,
+      #a6acb5 82%,
+      #9ba1aa 100%
+    );
+  color: #14161a;
+
+  /* A chapa clara remapeia a tinta para quem estiver em cima dela. Sem isto,
+     um rótulo em aço-escuro sobre aço claro mede 1,7:1 — a faixa do setor
+     ficava com "30 tarefas" praticamente ilegível. */
+  --color-tinta: #14161a;
+  --color-tinta-fraca: #2b3036;
+  --color-aco: #14161a;
+  --color-aco-escuro: #2b3036;
+}
+
+.aco-escura {
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.035) 0 1px,
+      transparent 1px 4px
+    ),
+    linear-gradient(180deg, #3a3d44 0%, #2a2c31 55%, #202225 100%);
+
+  /* Mesma correção na chapa escura: #7D838C sobre ela mede 3,66:1, abaixo do
+     piso de 4,5 para texto pequeno — e é onde vivem os rótulos das colunas. */
+  --color-aco-escuro: #b6bbc2;
+  --color-tinta-fraca: #c8ccd2;
+}
+
+/* A palheta: meia superfície alta que pega luz, meia baixa na sombra, e a
+   dobradiça no meio. É a unidade atômica da interface. */
+.palheta {
+  background-image: linear-gradient(
+    180deg,
+    var(--color-flap-alto) 0%,
+    #191a1e 48.5%,
+    var(--hinge) 48.5%,
+    var(--hinge) 51.5%,
+    #121316 51.5%,
+    var(--color-flap-sombra) 100%
+  );
+  border-radius: 2px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* A palheta que nunca foi virada. Canal de confiança: aço, não âmbar.
+   Não é um zero — é a ausência de resposta, e a interface diz isso. */
+.palheta-vazia {
+  background-image: linear-gradient(
+    180deg,
+    #17181c 0%,
+    #141519 48.5%,
+    var(--hinge) 48.5%,
+    var(--hinge) 51.5%,
+    #101114 51.5%,
+    #131417 100%
+  );
+  border-radius: 2px;
+  box-shadow: inset 0 0 0 1px rgba(125, 131, 140, 0.34);
+}
+
+/* Lâmpada de fileira. Uma matriz de pontos, como a do painel real. */
+.lampada {
+  border-radius: 9999px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.8);
+}
+.lampada-verde {
+  background: var(--color-verde);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.8),
+    0 0 7px rgba(63, 191, 111, 0.55);
+}
+.lampada-ambar {
+  background: var(--color-ambar);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.8),
+    0 0 7px rgba(255, 180, 0, 0.6);
+}
+.lampada-vermelha {
+  background: var(--color-vermelho);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.8),
+    0 0 8px rgba(211, 47, 47, 0.65);
+}
+
+/* A junta entre duas fileiras de palheta. */
+.junta {
+  border-bottom: 1px solid #000;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+/* ---------------------------------------------------------------------------
+   A cascata. O momento autoral desta interface, e o único lugar com movimento:
+   a palheta rola pelos valores intermediários até chegar no novo, como o painel
+   de estação rola pelo alfabeto. Tudo o mais é estático de propósito.
+   --------------------------------------------------------------------------- */
+
+@keyframes virar {
+  0% {
+    transform: rotateX(0deg);
+    filter: brightness(1);
+  }
+  49% {
+    transform: rotateX(-88deg);
+    filter: brightness(1.5);
+  }
+  50% {
+    transform: rotateX(-92deg);
+    filter: brightness(0.45);
+  }
+  100% {
+    transform: rotateX(-180deg);
+    filter: brightness(1);
+  }
+}
+
+.virando {
+  animation: virar 120ms cubic-bezier(0.32, 0, 0.67, 0) both;
+  transform-origin: center bottom;
+  backface-visibility: hidden;
+}
+
+@keyframes acender {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.acendendo {
+  animation: acender 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .virando,
+  .acendendo {
+    animation: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   O letreiro.
+
+   No painel de estação o texto grande vive em células de palheta com a linha de
+   dobradiça atravessando — é o traço mais identificável do mundo, e usá-lo só
+   nos dígitos deixava os títulos parecendo qualquer painel escuro. A grade fica
+   atrás do texto, nas medidas da palheta, e nunca compete com ele.
+   --------------------------------------------------------------------------- */
+
+.letreiro {
+  position: relative;
+  display: inline-block;
+  padding: 0.5rem 0.75rem;
+  isolation: isolate;
+}
+
+.letreiro::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    /* as divisórias verticais entre células */
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.05) 0 1px,
+      transparent 1px 2.15rem
+    ),
+    /* a dobradiça no meio da altura */
+    linear-gradient(
+      180deg,
+      transparent 0 calc(50% - 1px),
+      rgba(0, 0, 0, 0.85) calc(50% - 1px) calc(50% + 1px),
+      transparent calc(50% + 1px)
+    ),
+    linear-gradient(180deg, #1c1d21 0%, #141519 49%, #0f1013 51%, #17181c 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* ---------------------------------------------------------------------------
+   Controles de formulário.
+
+   O cadastro é tela nova, mas não é mundo novo: o campo é uma palheta em
+   branco esperando ser escrita, com a mesma dobradiça e a mesma tinta. O botão
+   primário usa o âmbar, que já é a cor da ação neste sistema.
+   --------------------------------------------------------------------------- */
+
+.campo {
+  display: block;
+  width: 100%;
+  background-color: var(--color-flap-sombra);
+  color: var(--color-tinta);
+  border: 1px solid rgba(125, 131, 140, 0.45);
+  border-radius: 2px;
+  padding: 0.5rem 0.625rem;
+  font-variation-settings: "wdth" var(--wdth-normal), "wght" 400;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  transition: border-color 120ms ease-out;
+}
+
+.campo:hover {
+  border-color: rgba(182, 187, 194, 0.7);
+}
+
+.campo:focus {
+  outline: none;
+  border-color: var(--color-ambar);
+}
+
+select.campo {
+  /* a seta nativa em fundo escuro some; desenhamos a nossa */
+  appearance: none;
+  padding-right: 2rem;
+  background-image: linear-gradient(
+      45deg,
+      transparent 50%,
+      var(--color-aco-escuro) 50%
+    ),
+    linear-gradient(135deg, var(--color-aco-escuro) 50%, transparent 50%);
+  background-position:
+    calc(100% - 1rem) calc(50% + 1px),
+    calc(100% - 0.7rem) calc(50% + 1px);
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+}
+
+.rotulo-campo {
+  display: block;
+  font-variation-settings: "wdth" var(--wdth-estreita), "wght" 600;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.6875rem;
+  line-height: 1;
+  color: var(--color-aco-escuro);
+  margin-bottom: 0.5rem;
+}
+
+.botao {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  background-color: var(--color-ambar);
+  color: var(--color-flap);
+  border: 1px solid var(--color-ambar);
+  border-radius: 2px;
+  padding: 0.5rem 0.9375rem;
+  font-variation-settings: "wdth" var(--wdth-estreita), "wght" 800;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.6875rem;
+  cursor: pointer;
+  transition: filter 120ms ease-out;
+}
+
+.botao:hover {
+  filter: brightness(1.12);
+}
+
+.botao:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: none;
+}
+
+.botao-fantasma {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  background: transparent;
+  color: var(--color-tinta);
+  border: 1px solid rgba(125, 131, 140, 0.45);
+  border-radius: 2px;
+  padding: 0.5rem 0.9375rem;
+  font-variation-settings: "wdth" var(--wdth-estreita), "wght" 600;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.6875rem;
+  cursor: pointer;
+  transition: border-color 120ms ease-out, color 120ms ease-out;
+}
+
+.botao-fantasma:hover {
+  border-color: var(--color-ambar);
+  color: var(--color-ambar);
+}
+
+.botao-perigo {
+  color: var(--color-vermelho-tinta);
+  border-color: rgba(211, 47, 47, 0.55);
+}
+
+.botao-perigo:hover {
+  border-color: var(--color-vermelho);
+  color: var(--color-vermelho-tinta);
+  background-color: rgba(211, 47, 47, 0.12);
+}
+
+/* ---------------------------------------------------------------------------
+   MODO CLARO — a folha de horários impressa.
+
+   Não é o painel com as cores invertidas: é o outro artefato da mesma estação.
+   O painel de partidas é preto por natureza, e clareá-lo dissolveria o mundo.
+   A tabela de horários impressa em papel tem a mesma tipografia, a mesma grade
+   e a mesma lei de cor — só que tinta sobre papel em vez de palheta sobre
+   preto. A palheta vira célula impressa; o aço escovado vira tarja de cabeçalho.
+
+   A regra dos dois canais continua valendo e é o que precisa sobreviver à
+   travessia: âmbar e vermelho só onde o farol dispara, aço só para confiança.
+   Ambos escurecem, porque o mesmo pigmento que lê sobre preto some sobre papel.
+   --------------------------------------------------------------------------- */
+
+:root[data-tema="claro"] {
+  color-scheme: light;
+
+  /* o papel, e a tinta de impressão */
+  --color-flap: #eeeeea;
+  --color-flap-sombra: #e3e3de;
+  --color-flap-alto: #f8f8f6;
+  --color-flap-borda: #c6c6c0;
+
+  --color-tinta: #16171a;
+  --color-tinta-fraca: #56585d;
+
+  /* canal de RISCO, repigmentado para papel */
+  --color-ambar: #8a5500;
+  --color-ambar-chapa: #3d2900;
+  --color-vermelho: #b3261e;
+  --color-vermelho-tinta: #9c1f18;
+  --color-verde: #146b3f;
+
+  /* canal de CONFIANÇA */
+  --color-aco: #4a4d53;
+  --color-aco-escuro: #6b6e75;
+  --color-aco-fundo: #d8d8d3;
+
+  --hinge: rgba(0, 0, 0, 0.16);
+}
+
+:root[data-tema="claro"] body {
+  /* a textura do papel: uma trama fina, quase invisível, que impede a chapa
+     branca de parecer um documento em branco */
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.012) 0 1px,
+    transparent 1px 3px
+  );
+}
+
+/* A célula impressa: fio de contorno e a mesma dobradiça, agora como um filete
+   claro. Continua sendo uma célula de painel, não uma caixinha de formulário. */
+:root[data-tema="claro"] .palheta {
+  background-image: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #fbfbf9 48.5%,
+    var(--hinge) 48.5%,
+    var(--hinge) 51.5%,
+    #f6f6f3 51.5%,
+    #f1f1ee 100%
+  );
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.14),
+    0 1px 0 rgba(0, 0, 0, 0.05);
+}
+
+:root[data-tema="claro"] .palheta-vazia {
+  background-image: none;
+  background-color: #e9e9e4;
+  box-shadow: inset 0 0 0 1px rgba(107, 110, 117, 0.45);
+}
+
+/* A tarja de cabeçalho impressa: chapada, com tinta reversa. É o que um horário
+   de estação faz onde o painel usa aço escovado. */
+:root[data-tema="claro"] .aco {
+  background-image: none;
+  background-color: #23262b;
+  color: #f2f2ef;
+  --color-tinta: #f2f2ef;
+  --color-tinta-fraca: #c2c5ca;
+  --color-aco: #eceded;
+  --color-aco-escuro: #b7bac0;
+}
+
+:root[data-tema="claro"] .aco-escura {
+  background-image: none;
+  background-color: #dcdcd6;
+  border-color: rgba(0, 0, 0, 0.18);
+  --color-aco-escuro: #4a4d53;
+  --color-tinta-fraca: #3a3d42;
+}
+
+:root[data-tema="claro"] .junta {
+  border-bottom-color: rgba(0, 0, 0, 0.14);
+  box-shadow: none;
+}
+
+:root[data-tema="claro"] .letreiro::before {
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.1) 0 1px,
+      transparent 1px 2.15rem
+    ),
+    linear-gradient(
+      180deg,
+      transparent 0 calc(50% - 1px),
+      rgba(0, 0, 0, 0.16) calc(50% - 1px) calc(50% + 1px),
+      transparent calc(50% + 1px)
+    ),
+    linear-gradient(180deg, #ffffff 0%, #fafaf8 49%, #f4f4f1 51%, #efefec 100%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+:root[data-tema="claro"] .campo {
+  background-color: #ffffff;
+  border-color: rgba(0, 0, 0, 0.22);
+}
+
+:root[data-tema="claro"] .botao {
+  color: #ffffff;
+}
+
+:root[data-tema="claro"] .lampada-verde {
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.3),
+    0 0 5px rgba(20, 107, 63, 0.35);
+}
+:root[data-tema="claro"] .lampada-ambar {
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.3),
+    0 0 5px rgba(138, 85, 0, 0.35);
+}
+:root[data-tema="claro"] .lampada-vermelha {
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.3),
+    0 0 5px rgba(179, 38, 30, 0.4);
+}
+
+:root[data-tema="claro"] ::-webkit-scrollbar-track,
+:root[data-tema="claro"] ::-webkit-scrollbar-corner {
+  background: var(--color-flap-borda);
+}
+:root[data-tema="claro"] ::-webkit-scrollbar-thumb {
+  background: var(--color-aco-escuro);
+  border-color: var(--color-flap-borda);
+}
+:root[data-tema="claro"] * {
+  scrollbar-color: var(--color-aco-escuro) var(--color-flap-borda);
+}

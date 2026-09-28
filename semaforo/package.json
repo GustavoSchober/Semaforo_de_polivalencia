@@ -1,0 +1,42 @@
+{
+  "name": "semaforo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "tsx --env-file=.env.local scripts/seed.ts",
+    "db:up": "podman start semaforo-db || podman run -d --name semaforo-db -e POSTGRES_PASSWORD=dev -e POSTGRES_USER=semaforo -e POSTGRES_DB=semaforo -p 5432:5432 -v semaforo-pgdata:/var/lib/postgresql/data docker.io/library/postgres:17",
+    "db:down": "podman stop semaforo-db",
+    "test": "vitest run testes/dominio.test.ts testes/permissoes.test.ts",
+    "test:watch": "vitest",
+    "db:seed-dev": "tsx --env-file=.env.local scripts/seed-dev.ts",
+    "test:db": "vitest run testes/db",
+    "test:all": "vitest run"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.3",
+    "next": "16.3.6",
+    "postgres": "^3.4.9",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^22.20.4",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.11",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.6",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.15",
+    "typescript": "^5",
+    "vitest": "^5.0.2"
+  }
+}

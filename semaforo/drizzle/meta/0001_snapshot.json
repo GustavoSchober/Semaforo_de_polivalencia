@@ -1,0 +1,858 @@
+{
+  "id": "5304124b-aa44-4771-b045-9e009b1b3d7a",
+  "prevId": "1d9e8840-85c5-4adb-9e07-9144d7adadd9",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.autoavaliacao": {
+      "name": "autoavaliacao",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "name": "autoavaliacao_id_seq",
+            "increment": "1",
+            "minValue": "1",
+            "maxValue": "9223372036854775807",
+            "startWith": "1",
+            "cache": "1",
+            "cycle": false,
+            "schema": "public",
+            "type": "always"
+          }
+        },
+        "ciclo_id": {
+          "name": "ciclo_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "colaborador_id": {
+          "name": "colaborador_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tarefa_id": {
+          "name": "tarefa_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "valor": {
+          "name": "valor",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "observacao": {
+          "name": "observacao",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "status_autoav",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pendente'"
+        },
+        "decidido_por": {
+          "name": "decidido_por",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "decidido_em": {
+          "name": "decidido_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "autoavaliacao_ciclo_id_ciclo_id_fk": {
+          "name": "autoavaliacao_ciclo_id_ciclo_id_fk",
+          "tableFrom": "autoavaliacao",
+          "columnsFrom": [
+            "ciclo_id"
+          ],
+          "tableTo": "ciclo",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "autoavaliacao_colaborador_id_colaborador_id_fk": {
+          "name": "autoavaliacao_colaborador_id_colaborador_id_fk",
+          "tableFrom": "autoavaliacao",
+          "columnsFrom": [
+            "colaborador_id"
+          ],
+          "tableTo": "colaborador",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "autoavaliacao_tarefa_id_tarefa_id_fk": {
+          "name": "autoavaliacao_tarefa_id_tarefa_id_fk",
+          "tableFrom": "autoavaliacao",
+          "columnsFrom": [
+            "tarefa_id"
+          ],
+          "tableTo": "tarefa",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "autoavaliacao_decidido_por_colaborador_id_fk": {
+          "name": "autoavaliacao_decidido_por_colaborador_id_fk",
+          "tableFrom": "autoavaliacao",
+          "columnsFrom": [
+            "decidido_por"
+          ],
+          "tableTo": "colaborador",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "autoavaliacao_ciclo_colaborador_tarefa_key": {
+          "name": "autoavaliacao_ciclo_colaborador_tarefa_key",
+          "columns": [
+            "ciclo_id",
+            "colaborador_id",
+            "tarefa_id"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "autoavaliacao_escala_valida": {
+          "name": "autoavaliacao_escala_valida",
+          "value": "\"autoavaliacao\".\"valor\" between 0 and 4"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.ciclo": {
+      "name": "ciclo",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "name": "ciclo_id_seq",
+            "increment": "1",
+            "minValue": "1",
+            "maxValue": "9223372036854775807",
+            "startWith": "1",
+            "cache": "1",
+            "cycle": false,
+            "schema": "public",
+            "type": "always"
+          }
+        },
+        "departamento_id": {
+          "name": "departamento_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "referencia": {
+          "name": "referencia",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "status_ciclo",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'aberto'"
+        },
+        "fechado_em": {
+          "name": "fechado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fechado_por": {
+          "name": "fechado_por",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "ciclo_departamento_id_departamento_id_fk": {
+          "name": "ciclo_departamento_id_departamento_id_fk",
+          "tableFrom": "ciclo",
+          "columnsFrom": [
+            "departamento_id"
+          ],
+          "tableTo": "departamento",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        },
+        "ciclo_fechado_por_colaborador_id_fk": {
+          "name": "ciclo_fechado_por_colaborador_id_fk",
+          "tableFrom": "ciclo",
+          "columnsFrom": [
+            "fechado_por"
+          ],
+          "tableTo": "colaborador",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "ciclo_departamento_referencia_key": {
+          "name": "ciclo_departamento_referencia_key",
+          "columns": [
+            "departamento_id",
+            "referencia"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {
+        "ciclo_referencia_primeiro_dia": {
+          "name": "ciclo_referencia_primeiro_dia",
+          "value": "\"ciclo\".\"referencia\" = date_trunc('month', \"ciclo\".\"referencia\")::date"
+        },
+        "ciclo_fechamento_coerente": {
+          "name": "ciclo_fechamento_coerente",
+          "value": "(\"ciclo\".\"status\" = 'fechado') = (\"ciclo\".\"fechado_em\" is not null)"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.colaborador": {
+      "name": "colaborador",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "name": "colaborador_id_seq",
+            "increment": "1",
+            "minValue": "1",
+            "maxValue": "9223372036854775807",
+            "startWith": "1",
+            "cache": "1",
+            "cycle": false,
+            "schema": "public",
+            "type": "always"
+          }
+        },
+        "departamento_id": {
+          "name": "departamento_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "auth_user_id": {
+          "name": "auth_user_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "nome": {
+          "name": "nome",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "papel": {
+          "name": "papel",
+          "type": "papel",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'colaborador'"
+        },
+        "entrada_em": {
+          "name": "entrada_em",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "saida_em": {
+          "name": "saida_em",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "colaborador_departamento_id_departamento_id_fk": {
+          "name": "colaborador_departamento_id_departamento_id_fk",
+          "tableFrom": "colaborador",
+          "columnsFrom": [
+            "departamento_id"
+          ],
+          "tableTo": "departamento",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "colaborador_auth_user_id_unique": {
+          "name": "colaborador_auth_user_id_unique",
+          "columns": [
+            "auth_user_id"
+          ],
+          "nullsNotDistinct": false
+        },
+        "colaborador_email_unique": {
+          "name": "colaborador_email_unique",
+          "columns": [
+            "email"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.departamento": {
+      "name": "departamento",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "name": "departamento_id_seq",
+            "increment": "1",
+            "minValue": "1",
+            "maxValue": "9223372036854775807",
+            "startWith": "1",
+            "cache": "1",
+            "cycle": false,
+            "schema": "public",
+            "type": "always"
+          }
+        },
+        "nome": {
+          "name": "nome",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "criado_em": {
+          "name": "criado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "departamento_nome_unique": {
+          "name": "departamento_nome_unique",
+          "columns": [
+            "nome"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.nivel": {
+      "name": "nivel",
+      "schema": "",
+      "columns": {
+        "ciclo_id": {
+          "name": "ciclo_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tarefa_id": {
+          "name": "tarefa_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "colaborador_id": {
+          "name": "colaborador_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "valor": {
+          "name": "valor",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "avaliado": {
+          "name": "avaliado",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "origem": {
+          "name": "origem",
+          "type": "origem_nivel",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'gestor'"
+        },
+        "atualizado_por": {
+          "name": "atualizado_por",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "atualizado_em": {
+          "name": "atualizado_em",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "nivel_ciclo_colaborador_idx": {
+          "name": "nivel_ciclo_colaborador_idx",
+          "columns": [
+            {
+              "expression": "ciclo_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "colaborador_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        },
+        "nivel_ciclo_tarefa_idx": {
+          "name": "nivel_ciclo_tarefa_idx",
+          "columns": [
+            {
+              "expression": "ciclo_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "tarefa_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {
+        "nivel_ciclo_id_ciclo_id_fk": {
+          "name": "nivel_ciclo_id_ciclo_id_fk",
+          "tableFrom": "nivel",
+          "columnsFrom": [
+            "ciclo_id"
+          ],
+          "tableTo": "ciclo",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "nivel_tarefa_id_tarefa_id_fk": {
+          "name": "nivel_tarefa_id_tarefa_id_fk",
+          "tableFrom": "nivel",
+          "columnsFrom": [
+            "tarefa_id"
+          ],
+          "tableTo": "tarefa",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        },
+        "nivel_colaborador_id_colaborador_id_fk": {
+          "name": "nivel_colaborador_id_colaborador_id_fk",
+          "tableFrom": "nivel",
+          "columnsFrom": [
+            "colaborador_id"
+          ],
+          "tableTo": "colaborador",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        },
+        "nivel_atualizado_por_colaborador_id_fk": {
+          "name": "nivel_atualizado_por_colaborador_id_fk",
+          "tableFrom": "nivel",
+          "columnsFrom": [
+            "atualizado_por"
+          ],
+          "tableTo": "colaborador",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "nivel_ciclo_id_tarefa_id_colaborador_id_pk": {
+          "name": "nivel_ciclo_id_tarefa_id_colaborador_id_pk",
+          "columns": [
+            "ciclo_id",
+            "tarefa_id",
+            "colaborador_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "nivel_escala_valida": {
+          "name": "nivel_escala_valida",
+          "value": "\"nivel\".\"valor\" between 0 and 4"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.setor": {
+      "name": "setor",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "name": "setor_id_seq",
+            "increment": "1",
+            "minValue": "1",
+            "maxValue": "9223372036854775807",
+            "startWith": "1",
+            "cache": "1",
+            "cycle": false,
+            "schema": "public",
+            "type": "always"
+          }
+        },
+        "departamento_id": {
+          "name": "departamento_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nome": {
+          "name": "nome",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ordem": {
+          "name": "ordem",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "setor_departamento_id_departamento_id_fk": {
+          "name": "setor_departamento_id_departamento_id_fk",
+          "tableFrom": "setor",
+          "columnsFrom": [
+            "departamento_id"
+          ],
+          "tableTo": "departamento",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "setor_departamento_nome_key": {
+          "name": "setor_departamento_nome_key",
+          "columns": [
+            "departamento_id",
+            "nome"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.tarefa": {
+      "name": "tarefa",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigint",
+          "primaryKey": true,
+          "notNull": true,
+          "identity": {
+            "name": "tarefa_id_seq",
+            "increment": "1",
+            "minValue": "1",
+            "maxValue": "9223372036854775807",
+            "startWith": "1",
+            "cache": "1",
+            "cycle": false,
+            "schema": "public",
+            "type": "always"
+          }
+        },
+        "setor_id": {
+          "name": "setor_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "descricao": {
+          "name": "descricao",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "periodicidade": {
+          "name": "periodicidade",
+          "type": "periodicidade",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "prazo_ancora": {
+          "name": "prazo_ancora",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "peso_criticidade": {
+          "name": "peso_criticidade",
+          "type": "numeric(3, 1)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'1.0'"
+        },
+        "ordem": {
+          "name": "ordem",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "ativa_desde": {
+          "name": "ativa_desde",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "current_date"
+        },
+        "ativa_ate": {
+          "name": "ativa_ate",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "tarefa_setor_vigente_idx": {
+          "name": "tarefa_setor_vigente_idx",
+          "columns": [
+            {
+              "expression": "setor_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "with": {},
+          "method": "btree",
+          "where": "\"tarefa\".\"ativa_ate\" is null",
+          "concurrently": false
+        }
+      },
+      "foreignKeys": {
+        "tarefa_setor_id_setor_id_fk": {
+          "name": "tarefa_setor_id_setor_id_fk",
+          "tableFrom": "tarefa",
+          "columnsFrom": [
+            "setor_id"
+          ],
+          "tableTo": "setor",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "restrict"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "tarefa_peso_positivo": {
+          "name": "tarefa_peso_positivo",
+          "value": "\"tarefa\".\"peso_criticidade\" > 0"
+        },
+        "tarefa_vigencia_coerente": {
+          "name": "tarefa_vigencia_coerente",
+          "value": "\"tarefa\".\"ativa_ate\" is null or \"tarefa\".\"ativa_ate\" >= \"tarefa\".\"ativa_desde\""
+        }
+      },
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.origem_nivel": {
+      "name": "origem_nivel",
+      "schema": "public",
+      "values": [
+        "importacao",
+        "gestor",
+        "autoavaliacao_aprovada"
+      ]
+    },
+    "public.papel": {
+      "name": "papel",
+      "schema": "public",
+      "values": [
+        "colaborador",
+        "gestor",
+        "diretoria"
+      ]
+    },
+    "public.periodicidade": {
+      "name": "periodicidade",
+      "schema": "public",
+      "values": [
+        "diaria",
+        "semanal",
+        "mensal",
+        "anual"
+      ]
+    },
+    "public.status_autoav": {
+      "name": "status_autoav",
+      "schema": "public",
+      "values": [
+        "pendente",
+        "aprovada",
+        "rejeitada"
+      ]
+    },
+    "public.status_ciclo": {
+      "name": "status_ciclo",
+      "schema": "public",
+      "values": [
+        "aberto",
+        "fechado"
+      ]
+    }
+  },
+  "schemas": {},
+  "views": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
