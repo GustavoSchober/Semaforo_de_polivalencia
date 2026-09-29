@@ -37,6 +37,7 @@ npm run dev
 | `npm run db:migrate` | Aplica as migrations pendentes |
 | `npm run db:studio` | Inspetor visual do banco |
 | `npm run db:up` / `db:down` | Liga e desliga o Postgres |
+| `npx tsx --env-file=.env.local scripts/realinhar-ciclos.ts` | Alinha os ciclos do seed com a data do servidor (simula; `--aplicar` grava) |
 
 Para abrir um `psql` sem instalar nada no host:
 
@@ -122,7 +123,8 @@ Etapas 1 a 3 da ordem de construção, menos o deploy e o CRUD de administraçã
 - [x] Arquivos de deploy: Dockerfile, compose, Caddy, backup (seção 14)
 - [x] Cadastro de pessoas e tarefas pela interface, com desligamento e vigência
 - [x] Virada automática do mês, com herança de níveis declarada como herança
-- [x] Modo claro — a folha de horários impressa, ao lado do painel
+- [x] Modo claro, com preferência lembrada
+- [x] Popovers de "quem executa" e "quem ensina", por nome
 - [ ] **Login** — `lib/auth/sessao.ts` devolve um usuário fixo (ADR-005, etapa 4)
 - [ ] **Deploy no servidor, mesmo com a aplicação vazia** — a arquitetura insiste
       que isso seja feito cedo, não no fim

@@ -3,7 +3,11 @@ import { db } from "@/lib/db";
 import { departamento } from "@/lib/db/schema";
 import { ciclosDoDepartamento } from "@/lib/db/consultas/ciclos";
 import { coberturaDoDepartamento } from "@/lib/db/consultas/cobertura";
-import { celulasHerdadas, garantirCicloDoMes } from "@/lib/db/ciclo-vigente";
+import {
+  celulasHerdadas,
+  ciclosNoFuturo,
+  garantirCicloDoMes,
+} from "@/lib/db/ciclo-vigente";
 import { usuarioAtual } from "@/lib/auth/sessao";
 import { podeAdministrar } from "@/lib/auth/permissoes";
 import { Painel } from "@/app/componentes/moldura";
@@ -30,6 +34,7 @@ export default async function Ciclos() {
   }
 
   const vigente = await garantirCicloDoMes(dep.id);
+  const futuros = await ciclosNoFuturo(dep.id);
   const u = await usuarioAtual();
   const podeMexer = podeAdministrar(u, dep.id);
 
@@ -78,6 +83,23 @@ export default async function Ciclos() {
             </Link>
           </nav>
         </div>
+
+        {futuros.length > 0 && (
+          <AvisoDeServico
+            className="mt-8 border-t border-black"
+            tom="alerta"
+            titulo="Ciclo adiante do calendário"
+          >
+            {futuros.length === 1 ? "Existe 1 ciclo" : `Existem ${futuros.length} ciclos`}{" "}
+            com referência posterior ao mês corrente (
+            {futuros.map((f) => referenciaTitulo(f.referencia)).join(", ")}). A virada
+            automática só cria o mês do relógio, então isso veio de inserção manual ou
+            de um seed com datas fixas. Enquanto existir, o mês em andamento aparece
+            como um, e o trabalho pode acabar sendo lançado no outro. Rode{" "}
+            <code className="dado px-1">npx tsx --env-file=.env.local scripts/realinhar-ciclos.ts</code>{" "}
+            para ver o conserto proposto.
+          </AvisoDeServico>
+        )}
 
         {vigente?.viradoAgora && (
           <AvisoDeServico className="mt-8 border-t border-black" titulo="Mês virado agora">

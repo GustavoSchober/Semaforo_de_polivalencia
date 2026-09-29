@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { IconeLua, IconeSol } from "./icones";
 
 export type Tema = "escuro" | "claro";
 
@@ -36,10 +37,12 @@ function lerNoServidor(): Tema {
 }
 
 /**
- * A troca entre o painel e a folha impressa.
+ * Claro e escuro.
  *
- * Dois artefatos da mesma estação, não um tema e seu negativo — por isso os
- * rótulos dizem o que cada lado é, em vez de "claro" e "escuro".
+ * O modo claro foi desenhado como "folha de horários impressa" e o escuro como
+ * "painel de partidas" — mas isso é conversa de quem desenhou. Quem usa procura
+ * um sol e uma lua, então é isso que o controle diz. O vocabulário do mundo
+ * visual vive no DESIGN.md, não na barra de ferramentas.
  *
  * A preferência mora no `localStorage`: não existe back end de usuário enquanto
  * o login não existir (ADR-005), e criar tabela para dado de sessão seria
@@ -58,13 +61,9 @@ export function TrocaDeTema() {
     }
   }
 
-  const opcoes: { valor: Tema; rotulo: string; titulo: string }[] = [
-    { valor: "escuro", rotulo: "Painel", titulo: "Painel de partidas — fundo escuro" },
-    {
-      valor: "claro",
-      rotulo: "Impresso",
-      titulo: "Folha de horários — tinta sobre papel",
-    },
+  const opcoes = [
+    { valor: "claro" as const, rotulo: "Claro", Icone: IconeSol },
+    { valor: "escuro" as const, rotulo: "Escuro", Icone: IconeLua },
   ];
 
   return (
@@ -73,20 +72,21 @@ export function TrocaDeTema() {
       aria-label="Aparência"
       className="flex items-center gap-px border border-current/25 p-px"
     >
-      {opcoes.map((o) => (
+      {opcoes.map(({ valor, rotulo, Icone }) => (
         <button
-          key={o.valor}
+          key={valor}
           type="button"
-          title={o.titulo}
-          aria-pressed={tema === o.valor}
-          onClick={() => aplicar(o.valor)}
-          className={`rotulo-forte px-2 py-1 text-[0.5625rem] transition-colors ${
-            tema === o.valor
+          title={`Tema ${rotulo.toLowerCase()}`}
+          aria-pressed={tema === valor}
+          onClick={() => aplicar(valor)}
+          className={`rotulo-forte flex items-center gap-1.5 px-2 py-1 text-[0.5625rem] transition-colors ${
+            tema === valor
               ? "bg-current/90 text-flap"
               : "text-current opacity-60 hover:opacity-100"
           }`}
         >
-          {o.rotulo}
+          <Icone className="h-3 w-3" />
+          {rotulo}
         </button>
       ))}
     </div>

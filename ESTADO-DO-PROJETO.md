@@ -1,6 +1,6 @@
 # Semáforo de Polivalência — Estado do Projeto
 
-**Última atualização:** 28 de setembro de 2026
+**Última atualização:** 28 de setembro de 2026 (quarta leva do dia — ver seção 13)
 **Documento companheiro de:** `documentacao-semaforo-de-polivalencia.md` (o que a ferramenta faz)
 e `arquitetura-semaforo-de-polivalencia.md` (como ela vira software)
 
@@ -24,23 +24,114 @@ falta e o que isso desbloqueia.
 | **O que já está pronto? Por onde eu continuo?** | **Aqui** |
 | Que ideias ficaram para depois? | `semaforo/BACKLOG.md` |
 | Como rodo isso na minha máquina? | `semaforo/README.md`, e a seção 2 aqui |
+| Como a interface deve ser? Que regras ela tem? | `semaforo/DESIGN.md` |
+| Qual foi a direção visual e por quê? | `semaforo/.impeccable/surfaces/app.md` |
+| Quem usa, em que cena, com que restrições? | `semaforo/PRODUCT.md` |
+
+---
+
+## 0.1 ⏱️ COMECE POR AQUI — retomada em cinco minutos
+
+**Estado em uma frase:** a aplicação está completa como ferramenta de gestão — cadastra,
+calcula, simula e vira o mês sozinha — e **falta login para poder sair de `localhost`**.
+
+**Ligue e olhe:**
+
+```bash
+cd ~/Documentos/repo_pessoal/Semaforo_de_polivalencia/semaforo
+npm run db:up && npm run dev
+```
+
+Abra `http://localhost:3000`. Se os ciclos não baterem com o mês de hoje, veja 2 e rode
+`scripts/realinhar-ciclos.ts`.
+
+**Leia nesta ordem, se for mexer em código:**
+
+1. **Seção 10 daqui** — o que falta, em ordem de dependência. O próximo item é o login.
+2. **Seção 7.2 daqui** — as sete armadilhas desta stack que já custaram tempo. Ler isso
+   economiza horas.
+3. **`semaforo/DESIGN.md`** — as leis da interface. Não são gosto: a dos dois canais de
+   cor e a que proíbe travar a altura do invólucro existem por bugs reais.
+4. **Seção 6 daqui** — as decisões tomadas, com destaque para as que **contrariam a
+   arquitetura** (6.13 e 6.14). Se você for "consertar" uma delas sem ler, vai
+   reintroduzir um bug.
+
+**Antes de dar um commit:**
+
+```bash
+npm test && npm run test:db && npx tsc --noEmit && npm run lint
+```
+
+E, de dentro de `semaforo/`, o detector de divergência entre a interface e o DESIGN.md:
+
+```bash
+~/.claude/plugins/cache/impeccable/impeccable/*/skills/impeccable/scripts/impeccable detect --json app
+```
+
+**Nada foi commitado ainda.** O `semaforo/` inteiro está untracked. As migrations `0002`
+e `0003` mexem em schema e views — merecem um commit revisado, não um `git add .`.
+
+---
+
+## 0.2 Como o dado flui — o mapa que evita retrabalho
+
+Se você entender só uma coisa deste sistema, entenda esta.
+
+```
+            ┌──────────────┐        ┌──────────┐
+            │ colaborador  │        │  tarefa  │
+            │  saida_em    │        │ ativa_ate│
+            └──────┬───────┘        └────┬─────┘
+                   │                     │
+                   └────────┬────────────┘
+                            ▼
+                    ┌───────────────┐
+                    │     nivel     │  ← A ÚNICA FONTE DE VERDADE
+                    │  valor 0..4   │     (ciclo, tarefa, pessoa)
+                    │  avaliado     │
+                    │  origem       │
+                    └───────┬───────┘
+                            ▼
+                  ┌──────────────────┐
+                  │ v_nivel_vigente  │  ← filtra quem saiu e o que
+                  └─────────┬────────┘     saiu de vigência
+                            ▼
+      ┌─────────────┬───────┴────────┬──────────────┐
+      ▼             ▼                ▼              ▼
+  v_semaforo   v_pontuacao   v_cobertura_*   f_semaforo_simulado
+      │             │                │              │
+      ▼             ▼                ▼              ▼
+   MATRIZ       EVOLUÇÃO      PAINEL DE RISCO   SIMULADOR
+```
+
+**As três regras que caem daqui:**
+
+1. **Nada calculável é armazenado.** "3 pessoas executam" não existe em coluna nenhuma;
+   é `count(*) where valor >= 3` na hora da leitura. É por isso que desligar alguém
+   repercute em todas as telas sem nada ser atualizado à mão.
+2. **Nada é apagado.** Desligar grava `saida_em`; tirar tarefa do catálogo grava
+   `ativa_ate`. Quem filtra é `v_nivel_vigente`, num lugar só.
+3. **A tela da tarefa é a matriz vista de lado.** `/gerenciar/catalogo/[tarefa]` edita as
+   mesmas células de `nivel`. Não existe tabela de "capaz/não capaz", e criar uma seria
+   uma segunda fonte de verdade — ver decisão 6.18.
 
 ---
 
 ## 1. Resumo em uma tela
 
-A aplicação **existe, roda e grava**. Cinco telas funcionando contra Postgres real, com
-a camada de cálculo em views verificada por teste. O que falta para virar ferramenta de
-verdade são três coisas, nesta ordem: **login**, **abrir/fechar ciclo pela interface** e
-**deploy no servidor**.
+A aplicação **existe, roda, grava e já se administra por dentro**. Nove rotas contra
+Postgres real, camada de cálculo em views verificada por teste, front end reconstruído
+sobre um sistema de design documentado, e o ciclo mensal virando sozinho pela data do
+servidor. O que falta para virar ferramenta de verdade são duas coisas, nesta ordem:
+**login** e **deploy no servidor**.
 
 | Etapa (arquitetura, seção 12) | Estado |
 |---|---|
 | **1 — Fundação** | ✅ Concluída, exceto o deploy |
 | **2 — A matriz** | ✅ Concluída |
-| **3 — O que faz alguém querer usar** | 🟡 Painel, simulador e evolução prontos; falta o CRUD de administração |
-| **4 — Virar o mês de verdade** | 🔴 Não iniciada (é aqui que entra o login e o abrir/fechar ciclo) |
-| **5 — Autoavaliação** | 🔴 Não iniciada |
+| **3 — O que faz alguém querer usar** | ✅ Concluída — painel, simulador, evolução e o CRUD de administração |
+| **4 — Virar o mês de verdade** | 🟡 A virada mensal automática está pronta e testada; falta o **login** |
+| **5 — Autoavaliação** | 🔴 Não iniciada — depende do login |
 
 **Marcos de validação (arquitetura, seção 12) — nenhum atingido ainda:**
 
@@ -51,7 +142,15 @@ verdade são três coisas, nesta ordem: **login**, **abrir/fechar ciclo pela int
 - 🔴 **Marco 3 — a virada acompanhada.** Depende da etapa 4.
 
 **Nada foi commitado.** `git status` mostra `semaforo/` como untracked. O último commit
-do repositório continua sendo `ee10c7d feat: adiciona README comercial`.
+do repositório continua sendo `ee10c7d feat: adiciona README comercial`. **As migrations
+`0002` e `0003` mudam schema e views — elas merecem um commit revisado, não um `git add
+.` apressado.**
+
+**Onde está o desenho.** `semaforo/DESIGN.md` é o sistema visual como ele foi
+construído, com os tokens em `semaforo/.impeccable/design.json`.
+`semaforo/.impeccable/surfaces/app.md` guarda a direção que o originou. Antes de mexer
+em qualquer tela, leia o DESIGN.md — ele tem leis que não são gosto, como os dois canais
+de cor.
 
 ---
 
@@ -72,9 +171,25 @@ Se o banco estiver vazio (máquina nova, volume apagado):
 npm install
 cp .env.example .env.local
 npm run db:up
-npm run db:migrate   # aplica as 2 migrations
+npm run db:migrate   # aplica as 4 migrations
 npm run db:seed      # 7 setores + 64 tarefas — o catálogo REAL
 npm run db:seed-dev  # níveis sintéticos, 3 ciclos — só para desenvolver
+```
+
+⚠️ **`npm run db:migrate` não carrega o `.env.local` sozinho.** Se ele reclamar de
+`url: undefined`:
+
+```bash
+set -a && . ./.env.local && set +a && npx drizzle-kit migrate
+```
+
+**Se os ciclos não baterem com o relógio** (o mês em andamento aparece fechado, ou o
+ciclo aberto é de um mês futuro), o banco foi semeado por uma versão antiga do
+`seed-dev`, que usava datas fixas:
+
+```bash
+npx tsx --env-file=.env.local scripts/realinhar-ciclos.ts            # simula
+npx tsx --env-file=.env.local scripts/realinhar-ciclos.ts --aplicar  # grava
 ```
 
 Para abrir um `psql` (não há cliente instalado no host, de propósito):
@@ -83,8 +198,19 @@ Para abrir um `psql` (não há cliente instalado no host, de propósito):
 podman exec -it semaforo-db psql -U semaforo -d semaforo
 ```
 
-**Por onde começar a olhar:** `http://localhost:3000/simulador/3`. A arquitetura (seção
-15) diz que é ali que a decisão de adotar acontece, não na matriz.
+**Por onde começar a olhar:** `http://localhost:3000/` — a lista de ciclos leva a todos
+os modos. A arquitetura (seção 15) diz que a decisão de adotar acontece no **simulador**,
+não na matriz, então é a segunda parada.
+
+**Antes de mexer em qualquer tela**, leia `semaforo/DESIGN.md`. Ele registra o sistema
+como ele foi construído e tem leis que não são questão de gosto — em especial a dos dois
+canais de cor (âmbar e vermelho só onde o farol dispara; aço só para dado incerto) e a
+que proíbe travar a altura do invólucro, que é o que causou a tela preta.
+
+**Para verificar o que mudar:** `npm test` (domínio), `npm run test:db` (views contra um
+cenário calculado à mão) e, dentro de `semaforo/`,
+`"$IMPECCABLE"/scripts/impeccable detect --json app` para saber se a interface divergiu
+do DESIGN.md.
 
 ---
 
@@ -169,14 +295,25 @@ disciplina, porque são exatamente as regras que a planilha erra.
 | `consultas/matriz.ts` | `matrizDoCiclo()` — 64×5 montado na forma da tela |
 | `consultas/simulacao.ts` | `simular()`, `pessoasDoCiclo()` |
 | `consultas/evolucao.ts` | `evolucaoDosColaboradores()`, `evolucaoDaCobertura()` |
+| `consultas/capacidade.ts` | `pessoasPorTarefa()` — QUEM está em cada tarefa, para os popovers |
+| `consultas/administracao.ts` | `colaboradoresDoDepartamento()`, `setoresDoDepartamento()`, `tarefasDoDepartamento()`, `tarefaPorId()` |
+| `ciclo-vigente.ts` | `garantirCicloDoMes()` (a virada automática), `celulasHerdadas()`, `ciclosNoFuturo()` |
 
-**Migrations aplicadas: 2.** Ambas registradas em `drizzle/meta/_journal.json` e no
+E, em `lib/dominio/` (funções puras, sem nenhum import):
+
+| Arquivo | Conteúdo |
+|---|---|
+| `elenco.ts` | `quemAlcanca()`, `quemRestaria()` — usadas no cliente, por isso não podem morar junto da consulta |
+
+**Migrations aplicadas: 4.** Ambas registradas em `drizzle/meta/_journal.json` e no
 banco (`drizzle.__drizzle_migrations`).
 
 | Migration | Conteúdo |
 |---|---|
 | `0000_schema_inicial.sql` | 5 enums, 7 tabelas, 3 índices, todos os CHECK e FK |
 | `0001_camada_de_calculo.sql` | 6 views + 1 função (escrita à mão, registrada como `--custom`) |
+| `0002_vigencia_e_heranca.sql` | Enum `origem_nivel` ganha `'herdado'`; nasce `v_nivel_vigente` e TODA a camada acima é recriada sobre ela; a função de simulação também |
+| `0003_vigencia_sem_inicio.sql` | Conserta a `0002`: o filtro por `ativa_desde` apagava todo ciclo anterior a hoje, porque esse campo recebe `current_date` no cadastro |
 
 **As 6 views e a função:**
 
@@ -189,6 +326,11 @@ banco (`drizzle.__drizzle_migrations`).
 | `v_evolucao` | A aba `Gráfico` |
 | `v_evolucao_cobertura` | Não existe na planilha — sugestão 6 da seção 9.2 |
 | `f_semaforo_simulado(ciclo, ausentes[])` | Zerar a coluna de alguém à mão |
+| `v_nivel_vigente` | Não existe na planilha — é o filtro de vigência, e a base de todas as outras |
+
+⚠️ **`v_nivel_vigente` é o ponto de entrada de tudo.** Se você precisar mudar quem conta
+num cálculo, mude ali e a camada inteira acompanha. Mudar numa consulta específica cria
+divergência entre telas.
 
 ### 4.3 Permissões e sessão — `lib/auth/`
 
@@ -201,14 +343,32 @@ banco (`drizzle.__drizzle_migrations`).
 
 | Rota | Arquivo | Estado |
 |---|---|---|
-| `/` | `app/page.tsx` | ✅ Lista de ciclos com cobertura de cada um |
+| `/` | `app/page.tsx` | ✅ Lista de ciclos com cobertura e quantas tarefas exigem ação |
 | `/matriz/[ciclo]` | `app/matriz/[ciclo]/` | ✅ A grade editável — 4 arquivos |
-| `/painel/[ciclo]` | `app/painel/[ciclo]/page.tsx` | ✅ Painel de risco |
-| `/simulador/[ciclo]` | `app/simulador/[ciclo]/page.tsx` | ✅ Simulação de ausência |
-| `/evolucao` | `app/evolucao/page.tsx` | ✅ Pontos e cobertura entre ciclos |
-| `/admin/*` | — | 🔴 Não existe |
-| `/minha-avaliacao` | — | 🔴 Não existe |
+| `/painel/[ciclo]` | `app/painel/[ciclo]/page.tsx` | ✅ Painel de risco, com popover de quem faz |
+| `/simulador/[ciclo]` | `app/simulador/[ciclo]/` | ✅ Simulação de ausência ao vivo — 3 arquivos |
+| `/evolucao` | `app/evolucao/page.tsx` | ✅ Pequenos múltiplos por pessoa e cobertura |
+| `/gerenciar` | `app/gerenciar/page.tsx` | ✅ Equipe: criar, editar, desligar, readmitir |
+| `/gerenciar/catalogo` | `app/gerenciar/catalogo/page.tsx` | ✅ Tarefas: criar, editar, tirar de vigência |
+| `/gerenciar/catalogo/[tarefa]` | `app/gerenciar/catalogo/[tarefa]/` | ✅ Quem faz aquela tarefa, escala 0–4 |
+| `/gerenciar/ciclos` | `app/gerenciar/ciclos/page.tsx` | ✅ Ciclos, fechar/reabrir e denúncia de anomalia de data |
+| `/minha-avaliacao` | — | 🔴 Não existe — depende do login |
 | `/login` | — | 🔴 Não existe |
+
+**O kit de componentes — `app/componentes/`:**
+
+| Arquivo | Papel |
+|---|---|
+| `moldura.tsx` | O invólucro: chapa de aço, navegação de 6 modos, rodapé |
+| `palheta.tsx` | A palheta que rola (client) + `PalhetaNumero` para multi-dígito |
+| `palheta-fixa.tsx` | A mesma superfície, sem JavaScript, para telas de leitura |
+| `farol.tsx` | Lâmpada, célula do semáforo, placa de situação e as legendas |
+| `contador.tsx` | A cobertura em palhetas, com o trilho até a meta |
+| `aviso.tsx` | O aviso em dois tons: `servico` (aço) e `alerta` (vermelho) |
+| `explicacao.tsx` | O popover que pendura os NOMES no número |
+| `tema.tsx` | Claro/escuro, lido do DOM com `useSyncExternalStore` |
+| `icones.tsx` | Onze ícones desenhados, um sistema de traço só |
+| `formato.ts` | Percentual, referência de mês, horário da tarefa, plurais |
 
 **A matriz, em detalhe** (é a tela que a arquitetura diz decidir o projeto):
 
@@ -224,12 +384,21 @@ Requisitos não negociáveis da seção 9.1, todos atendidos:
 - ✅ Navegação por teclado — setas movem, `0`–`4` definem, `+`/`−` ajustam
 - ✅ Salvamento otimista com indicador ("salvo às 14:32"), e desfaz visual em caso de erro
 - ✅ Semáforo ao vivo na lateral, recalculado do estado local
-- ✅ Cabeçalho e coluna de tarefa fixos (`sticky`)
+- ⚠️ **Cabeçalho fixo REMOVIDO** — ver a decisão 6.13. O requisito da seção 9.1 deixou
+  de ser atendido de propósito: o `sticky` era a causa da tela preta.
 - ✅ Células não avaliadas visualmente distintas (tracejadas) das avaliadas com zero
 - ✅ Modo leitura para quem não é gestor, com a mesma aparência
 - ✅ Agrupamento por setor vindo de `setor_id`, substituindo as linhas em branco
 
-### 4.5 Testes — 39, todos passando
+### 4.5 Scripts — `scripts/`
+
+| Arquivo | O que faz |
+|---|---|
+| `seed.ts` | 7 setores e 64 tarefas — o catálogo REAL. Idempotente. |
+| `seed-dev.ts` | 3 ciclos e 960 células **sintéticas**. As referências são relativas ao relógio desde 28/09/2026 — antes eram fixas, e foi a causa do descompasso de datas. |
+| `realinhar-ciclos.ts` | Desloca os ciclos para alinhar o mais recente com o mês corrente. Simula por padrão; `--aplicar` grava. **Só para dados sintéticos.** |
+
+### 4.6 Testes — 39, todos passando
 
 | Arquivo | Testes | Precisa de banco? |
 |---|---|---|
@@ -251,7 +420,7 @@ resultados estão calculados à mão em comentário no topo do arquivo, e limpam
 cenário real da planilha, com os valores corrigidos) e o item 4 (teste do restore do
 backup).
 
-### 4.6 Deploy — `docker/` e `Dockerfile` ✅ escrito, 🔴 nunca executado
+### 4.7 Deploy — `docker/` e `Dockerfile` ✅ escrito, 🔴 nunca executado
 
 | Arquivo | Conteúdo |
 |---|---|
@@ -271,11 +440,11 @@ construída, nenhum contêiner de aplicação subiu.
 
 | # | Objetivo | Estado | Onde |
 |---|---|---|---|
-| 1 | Mapear tarefas + cadastrar novas por categoria | 🟡 O catálogo existe e é modelado; **falta o CRUD** | `lib/db/catalogo.ts`, `tarefa` |
-| 2 | Cronograma / periodicidade | 🟡 Modelado com as 4 opções + `prazo_ancora`; falta a tela de edição | `tarefa.periodicidade` |
+| 1 | Mapear tarefas + cadastrar novas por categoria | ✅ CRUD completo de tarefa; **falta só o cadastro de SETOR** | `/gerenciar/catalogo` |
+| 2 | Cronograma / periodicidade | ✅ Editável no formulário da tarefa, com prazo livre | `/gerenciar/catalogo` |
 | 3 | Posicionamento individual | ✅ | `v_pontuacao`, cabeçalho da matriz, `/evolucao` |
 | 4 | Grau de conhecimento por tarefa | ✅ | O inteiro 0–4 e a leitura horizontal do semáforo |
-| 5 | Troca de conhecimento | 🟡 A matriz é visível a todos; **falta a tela "quem pode me ensinar"** | — |
+| 5 | Troca de conhecimento | 🟡 Os popovers já dizem QUEM executa e QUEM ensina, por nome, no painel e no simulador; falta a tela que parte da PESSOA | `Explicacao`, `/gerenciar/catalogo/[tarefa]` |
 | 6 | Desempenho ao longo do período | ✅ | `v_evolucao`, `/evolucao` |
 | 7 | Risco de desligamento ou ausência | ✅ | `f_semaforo_simulado`, `/simulador` |
 | 8 | Base para promoção | ✅ | `/evolucao`, com a variação em destaque |
@@ -436,6 +605,90 @@ tarefa nova não aparece na grade.
 
 ---
 
+### 6.13 ⚠️ O cabeçalho fixo foi removido — e a seção 9.1 da documentação com ele
+
+A seção 9.1 pede cabeçalho e coluna fixos na matriz. Foram implementados, e **causaram um
+bug grave**: o invólucro de altura travada (`h-dvh` + `overflow: hidden`, com o `<main>`
+rolando por dentro) deixava o DOCUMENTO rolável ao mesmo tempo. O resultado é que a
+página inteira subia, levava o app de altura fixa para fora da tela, e o que sobrava era
+o fundo preto do `body` — uma "tela preta infinita" que impedia usar o painel de risco.
+
+Medido: `documentElement.scrollHeight` = 6203px contra uma viewport de 788px.
+
+A correção foi devolver a moldura ao fluxo normal da página. Com isso caiu também a
+`thead` grudada da matriz — dentro de um contêiner com `overflow-x`, ela nunca chegaria a
+colar de qualquer forma, porque aquele contêiner vira o scrollport e o `top` passa a ser
+medido a partir dele.
+
+**Consequência a assumir:** em 64 linhas, rolar e perder os nomes das colunas incomoda.
+Refazer exige um scrollport que não reintroduza o bug. Está no BACKLOG.
+
+### 6.14 Nível herdado na virada do mês, em vez de zerar `avaliado`
+
+A decisão 7.4 da arquitetura manda copiar os valores **zerando `avaliado`** na virada.
+Foi conscientemente contrariada, com aprovação do gestor.
+
+Zerar significa cobertura 0% todo dia 1º, painel de risco inutilizável nas primeiras
+semanas de cada mês e um buraco mensal na curva de evolução. O caminho adotado: o nível é
+copiado e **vale** desde o dia 1º, mas `origem` recebe o valor novo `'herdado'` e a
+interface declara isso em voz alta até alguém confirmar naquele ciclo.
+
+É a mesma disciplina do campo `avaliado`: o dado existe, e o quanto se pode confiar nele
+é dito, não escondido.
+
+### 6.15 A vigência passou a filtrar a camada de cálculo
+
+`v_semaforo` contava TODAS as linhas de `nivel`. Desligar alguém não mexia em indicador
+nenhum — o gestor via 3 pessoas cobrindo uma tarefa que, na prática, tinha 2.
+
+A migration `0002` introduz `v_nivel_vigente`, e toda a camada acima passou a derivar
+dela. A regra: uma linha só entra na conta se a pessoa **não tinha saído antes daquele
+ciclo** e a tarefa **ainda estava vigente**. Setembro continua dizendo o que era verdade
+em setembro; o mês corrente passa a dizer a verdade do mês corrente.
+
+⚠️ A migration `0003` conserta um erro da `0002`: o filtro incluía `ativa_desde`, e como
+esse campo recebe `current_date` no cadastro, todo ciclo anterior a hoje perdia suas
+linhas. O filtro por início é redundante — uma tarefa só tem linha nos ciclos em que já
+existia.
+
+### 6.16 O ciclo vigente é o do RELÓGIO, sem exceção
+
+Houve uma versão intermediária em que `garantirCicloDoMes()` devolvia o ciclo **mais
+recente**, para conviver com um seed que abria outubro enquanto o relógio dizia setembro.
+Era contornar o sintoma, e produziu exatamente o estado que o gestor apontou: mês em
+andamento fechado, mês futuro aberto.
+
+A regra final é dura: **o vigente é o do mês corrente**. Um ciclo à frente do calendário é
+anomalia de dado, nunca estado de trabalho — `ciclosNoFuturo()` o detecta e a tela de
+ciclos o denuncia em vermelho.
+
+O `seed-dev` foi corrigido para gerar datas **relativas** ao relógio. O
+`scripts/realinhar-ciclos.ts` conserta bancos semeados antes disso.
+
+### 6.17 Tema claro, e por que o rótulo não é o nome do conceito
+
+O modo claro foi desenhado como "folha de horários impressa" — o outro artefato da mesma
+estação, já que um painel de partidas é preto por natureza e clareá-lo dissolveria o
+mundo visual. **Mas o controle diz "Claro" e "Escuro", com sol e lua.** O vocabulário do
+mundo visual pertence ao DESIGN.md; a barra de ferramentas fala a língua de quem usa.
+
+O tema mora em `data-tema` no `<html>`, é aplicado por um script síncrono que é o
+**primeiro filho do `<body>`** (no `<head>` ele quebra a hidratação do App Router) e
+persiste em `localStorage`.
+
+### 6.18 O vínculo pessoa ↔ tarefa NÃO ganhou tabela nova
+
+A especificação de cadastro falava em "adicionar funcionários capazes de executar a
+tarefa", o que sugeria um vínculo booleano. Foi recusado: criar essa tabela seria uma
+segunda fonte de verdade ao lado de `nivel`.
+
+A tela da tarefa (`/gerenciar/catalogo/[tarefa]`) é **a matriz vista de lado** — as mesmas
+células de `nivel`, pela outra face. "Quantas executam" e "quantas ensinam" continuam
+derivadas de `v_nivel_vigente` na leitura. A tela diz isso ao usuário, com essas palavras:
+*"Não existe nenhum lugar onde eles possam ser digitados."*
+
+---
+
 ## 7. Investigações e problemas resolvidos
 
 Anotados para não serem redescobertos.
@@ -456,6 +709,70 @@ Anotados para não serem redescobertos.
 `drizzle-kit` (via `@esbuild-kit/core-utils`). Afetam apenas o **dev-server do esbuild**,
 não a aplicação. O `npm audit fix --force` rebaixaria `drizzle-kit` de 0.31 para 0.18 —
 troca ruim. Reavaliar quando o drizzle-kit atualizar a dependência.
+
+---
+
+### 7.2 ⚠️ As sete armadilhas desta stack — leia antes de codar
+
+Cada uma destas custou tempo real. Estão aqui para não custarem duas vezes.
+
+**1. `overflow-x-auto` também liga a rolagem vertical, e quebra `position: sticky`.**
+
+Um elemento com `overflow-x: auto` computa `overflow-y: auto` e vira o *scrollport* dos
+descendentes. Um `sticky top: 0` lá dentro passa a medir a distância a partir da borda
+DAQUELE div, não da janela — então ele desce em vez de grudar, ou simplesmente nunca
+gruda porque o contêiner não rola na vertical.
+
+Foi o que fez o cabeçalho da matriz renderizar 110px abaixo, por cima das linhas de
+dados. Se você for refazer o cabeçalho fixo (item 10.4), é esta a armadilha.
+
+**2. Travar a altura do invólucro cria rolagem fantasma — e no fundo preto ela é invisível.**
+
+`h-dvh` + `overflow: hidden` no invólucro, com o `<main>` rolando por dentro, deixou o
+DOCUMENTO rolável ao mesmo tempo: `documentElement.scrollHeight` = 6203px contra uma
+viewport de 788px. A página inteira subia e mostrava o fundo do `body`.
+
+Num aplicativo de fundo preto, isso aparece como "tela preta infinita" e só é notado ao
+rolar. **Regra: a página rola inteira. Não trave a altura do invólucro.**
+
+**3. `position: sticky` em `<tr>` não funciona — só nas células.**
+
+O navegador gruda `<th>`/`<td>`, e o fundo do `<tr>` fica para trás. Se um dia houver
+cabeçalho preso, o fundo tem de estar na célula, senão ele fica transparente por cima do
+conteúdo no instante em que cola.
+
+**4. Render prop não atravessa a fronteira servidor→cliente.**
+
+Passar `children={(estado) => ...}` de um Server Component para um Client Component
+falha com *"Functions are not valid as a child of Client Components"*. A solução usada
+em `app/gerenciar/`: os campos chegam como `children` já renderizados, e o botão de
+envio — que precisa do estado de pendência — mora dentro do componente cliente. A gaveta
+virou `<details>` nativo, sem JavaScript nenhum.
+
+**5. Importar um módulo de consulta no cliente arrasta o driver do Postgres.**
+
+`lib/db/consultas/capacidade.ts` importa `db`. Importar dele uma função pura no
+simulador levou o `postgres` inteiro para o bundle do navegador e derrubou a página. As
+funções puras foram para `lib/dominio/elenco.ts` — que é exatamente a razão da regra
+"`lib/dominio/` não importa nada".
+
+**6. `revalidatePath` não atualiza a árvore já renderizada no cliente.**
+
+Quando a Server Action é chamada dentro de uma transição (e não pelo `action` nativo do
+form), o cache do servidor é invalidado mas a tela continua mostrando o estado velho.
+Todo caminho de escrita em `app/gerenciar/` chama `router.refresh()` depois do sucesso.
+
+**7. SQL: `date + interval` vira `timestamp`, e `CASE` devolve `text`.**
+
+Dois erros `42804` seguidos no `realinhar-ciclos.ts`. Atribuir a uma coluna `date` exige
+`(... )::date`; atribuir a uma coluna de enum exige `(case ... end)::status_ciclo`.
+
+**Bônus — `drizzle-kit migrate` não lê o `.env.local`.** Ele falha com `url: undefined`.
+Use `set -a && . ./.env.local && set +a && npx drizzle-kit migrate`.
+
+**Bônus 2 — script de tema no `<head>` quebra a hidratação do App Router.** O `<head>` é
+montado pelo Next; um `<script>` colocado ali pelo JSX desalinha a árvore. Ele tem de ser
+o **primeiro filho do `<body>`**, com `suppressHydrationWarning` no `<html>` e no `<body>`.
 
 ---
 
@@ -489,6 +806,21 @@ wait_for_load()
 print(page_info())
 PY
 ```
+
+### 8.x Verificado na terceira leva (28/09, correções e cadastro)
+
+Tudo abaixo feito no navegador real, via CDP, contra o Postgres em contêiner:
+
+| O quê | Como | Resultado |
+|---|---|---|
+| Tela preta | Rolagem progressiva e até o fim, 9 rotas × 2 temas | Rolagem fantasma **zero** em 18/18; scroll termina no pixel exato |
+| Criar colaborador | Preenchendo o formulário pela interface | Criado com as 64 células no ciclo aberto; aparece na matriz |
+| Desligar / readmitir | Botão da tela de equipe | Cobertura 76,04% → 64,19% → 76,04%; mês fechado intacto |
+| Editar nível pela tarefa | Botões 0–4 da tela da tarefa | "Executam sozinhas" caiu de 3 para 2, com os nomes certos |
+| Popover de quem cobre | Clique no número, com alguém marcado como fora | Listou Luis e Pamella, sem o ausente |
+| Tema | Troca e navegação entre rotas | Persiste, sem piscar, zero erro de hidratação |
+| Mobile 390px | Transbordo horizontal e sobreposição | Sem transbordo; sobreposição da chapa corrigida |
+| Detector de design | `impeccable detect --json app` | 41 achados → **0** |
 
 ### 8.1 O que NÃO foi verificado
 
@@ -543,24 +875,39 @@ Contêiner `semaforo-db`, volume `semaforo-pgdata`, porta 5432.
 | `setor` | 7 |
 | `tarefa` | 64 |
 | `colaborador` | 5 |
-| `ciclo` | 3 (ids 1, 2, 3 — ago/26 e set/26 fechados, out/26 aberto) |
+| `ciclo` | 3 (ids 1, 2, 3 — jul/26 e ago/26 fechados, **set/26 aberto**) |
 | `nivel` | 960 (3 ciclos × 64 tarefas × 5 pessoas) |
 | `autoavaliacao` | 0 |
 
-Os ids dos ciclos são **1, 2 e 3** — é o que as URLs usam (`/matriz/3` é outubro).
+Os ids dos ciclos são **1, 2 e 3** — é o que as URLs usam (`/matriz/3` é o mês aberto).
+
+⚠️ **As referências mudaram em 28/09/2026.** Os ciclos eram ago/set/out com outubro
+aberto, o que deixava o mês em andamento fechado e um mês futuro aberto. Foram deslocados
+um mês para trás por `scripts/realinhar-ciclos.ts`, de forma uniforme — a distância entre
+eles e toda a curva de evolução ficaram intactas, só a etiqueta de mês mudou. Isso só é
+legítimo porque os níveis são sintéticos (9.1). **Num banco com a matriz real digitada,
+renomear o mês de uma medição seria falsificar histórico.**
+
+A partir de 1º de outubro, a virada é automática: no primeiro acesso, setembro fecha,
+outubro abre e os níveis são herdados. Não é preciso rodar nada.
 
 ---
 
 ## 10. O que falta, em ordem de dependência
 
+> Atualizado ao fim da sessão de 28/09/2026 (terceira leva). O CRUD de administração e a
+> virada de ciclo saíram desta lista — foram feitos. Ver seção 13.
+
 ### 10.1 🔴 Login — ADR-005, etapa 4 item 2
 
-**O maior bloqueador.** Hoje `lib/auth/sessao.ts` devolve um usuário fixo: **qualquer
-pessoa que alcance o servidor escreve na matriz como gestor.** Aceitável em localhost,
-inaceitável em qualquer máquina que outra pessoa alcance — os dados aqui são avaliação
-de desempenho usada para promoção e desligamento.
+**O maior bloqueador, e agora o único que sobrou antes do deploy.** Hoje
+`lib/auth/sessao.ts` devolve um usuário fixo: **qualquer pessoa que alcance o servidor
+escreve na matriz como gestor.** Aceitável em localhost, inaceitável em qualquer máquina
+que outra pessoa alcance — os dados aqui são avaliação de desempenho usada para promoção
+e desligamento.
 
-**O que já está pronto:** toda a camada de permissões, escrita e testada. Falta apenas
+**O que já está pronto:** toda a camada de permissões, escrita e testada. E agora também
+todas as telas de administração, que já chamam `podeAdministrar()`. Falta apenas
 responder "quem é a pessoa".
 
 **O que fazer:**
@@ -572,68 +919,45 @@ responder "quem é a pessoa".
    precisa mudar.
 4. **Virar `AUTENTICACAO_IMPLEMENTADA` para `true`**, senão o build de produção se recusa
    a subir.
-5. Bloquear login de colaborador com `saida_em` preenchido (mitigação da seção ADR-005).
+5. Bloquear login de colaborador com `saida_em` preenchido.
+6. **Depois do login, habilitar o colaborador a editar o próprio quadro.** O gestor
+   confirmou que é a EQUIPE quem mais preenche, mas `podeEditarMatriz()` ainda libera só
+   o gestor. As telas já acomodam; falta a permissão e a identidade.
 
-### 10.2 🔴 Abrir e fechar ciclo pela interface — etapa 4 item 1
+### 10.2 🔴 Deploy — etapa 1 item 2
 
-Hoje os ciclos existem só porque o `seed-dev` os criou. Não há como virar o mês.
+Os arquivos existem em `docker/` e nunca foram executados. A arquitetura insiste que o
+deploy aconteça cedo, não no fim. Falta o servidor, o nome interno e o certificado.
 
-**O que fazer:**
+⚠️ **Não suba antes do login.** A trava de 6.9 impede, e ela existe por bom motivo.
 
-1. Server Action `abrirCiclo(departamentoId, referencia)`:
-   - cria o `ciclo`;
-   - copia os valores de `nivel` do ciclo anterior **zerando `avaliado`** (decisão 7.4);
-   - resolve de vez a dúvida 6.11 (pré-popular ou não).
-2. Server Action `fecharCiclo(cicloId)` — com confirmação, porque torna tudo imutável.
-   Preencher `fechado_em` e `fechado_por`.
-3. Reabertura: a arquitetura diz que deve ficar registrada. O schema **ainda não tem
-   campo para isso** — hoje reabrir é só `status = 'aberto', fechado_em = null`, e a
-   informação de que houve reabertura se perde. Precisa de decisão: bastam os campos
-   atuais, ou entra uma tabela de auditoria?
-4. Se uma tarefa nova for cadastrada no meio do ciclo, ela precisa aparecer na grade —
-   ver a `sincronizar_ciclo()` mencionada em 6.11.
+### 10.3 🟡 CRUD de setor
 
-### 10.3 🔴 CRUD de administração — `/admin`, etapa 3 item 4
+Pessoa, tarefa e ciclo têm tela. **Setor não** — continua por SQL, então uma tarefa nova
+só pode entrar em setor que já existe. É o menor dos buracos do cadastro, e o caminho já
+está pavimentado: `setoresDoDepartamento()` existe em
+`lib/db/consultas/administracao.ts`, e o padrão de `Gaveta` + `Formulario` + Server
+Action está estabelecido em `app/gerenciar/`.
 
-É o **objetivo 1** da documentação, e o contraste vale a demonstração: hoje incluir uma
-tarefa na planilha exige inserir linha, replicar as fórmulas do semáforo e corrigir à mão
-os intervalos das fórmulas de setor. No sistema é um formulário com três campos.
+### 10.4 🟡 Cabeçalho de coluna da matriz
 
-Telas: tarefas, setores, pessoas. **Lembre do ADR-009:** tarefa nunca é deletada — o
-"excluir" preenche `ativa_ate`.
-
-### 10.4 🔴 Deploy — etapa 1 item 2
-
-A arquitetura insiste que isso seja feito **cedo, não no fim**, e já está atrasado em
-relação à ordem recomendada. Os arquivos existem; falta o servidor.
-
-**Perguntas que bloqueiam:** existe servidor interno disponível? Quem o administra? Se
-for a TI, converse antes, não depois.
-
-**Passos:** gerar os três segredos (`docker/secrets/README.md`), definir o nome interno
-no `Caddyfile`, `docker compose build`, `docker compose run --rm app npx drizzle-kit migrate`,
-`docker compose up -d`. Depois: **testar o restore do backup** antes de confiar nele.
+Removido junto com o invólucro de altura fixa que causava a tela preta (decisão 6.13).
+Em 64 linhas, perder os nomes das colunas ao rolar incomoda. Refazer exige um scrollport
+que não reintroduza o bug — a armadilha está documentada em 6.13, leia antes de tentar.
 
 ### 10.5 🔴 Autoavaliação do colaborador — etapa 5
 
-A tela `/minha-avaliacao` e a fila de aprovação do gestor. Elimina o passo 3 do processo
-de elaboração ("gestor compila as tarefas em duplicidade"), que é trabalho puramente
-mecânico.
-
-A tabela `autoavaliacao` já existe no schema e está vazia. Fica por último de propósito:
-o gestor consegue usar o sistema inteiro sem ela.
+Depende inteiramente do login. O schema já tem a tabela `autoavaliacao` com a fila de
+aprovação; nenhuma tela a usa ainda.
 
 ### 10.6 🟡 Itens menores, alto valor por esforço
 
-- **Tela "quem pode me ensinar isso"** — escolho a tarefa, vejo quem está em nível 4. É o
-  objetivo 5 materializado, é barato, e é o recurso que faz o colaborador abrir a
-  ferramenta por vontade própria.
-- **`pontuacao_historica`** — os 66 números da aba `Gráfico` (6 pessoas × 11 períodos)
-  estão reproduzidos na seção 4.1 da documentação funcional. Digitados numa tabela, dão
-  14 meses de história ao gráfico de evolução sem nenhum importador. Custa uma hora.
-- **Teste de regressão do cenário real** (seção 13, item 3) — depende de ter dados reais.
-
----
+- Tela "quem pode me ensinar isto" — hoje a informação existe nos popovers do painel e do
+  simulador, mas não há uma tela que parta da PESSOA.
+- Exportação em PDF/xlsx do painel, para apresentação.
+- Consolidação entre departamentos (objetivo 9) — `departamento_id` já existe em tudo,
+  falta tela e um segundo departamento.
+- Revisar o app em **build de produção**: nada foi inspecionado fora do `next dev`.
 
 ## 11. Perguntas em aberto
 
@@ -716,6 +1040,108 @@ Do zero à aplicação funcionando. Ordem do que foi feito:
 
 **Resultado:** 39 testes passando, build e lint limpos, 5 rotas servindo 200.
 
+### Sessão de 28 de setembro de 2026 — segunda leva: reconstrução do front end
+
+O front end foi refeito do zero. O anterior era o scaffold do `create-next-app` intacto:
+Arial, `border-neutral-200`, sem identidade, com as quatro colunas do semáforo sem rótulo
+e a cobertura de 76% num texto de 14px ao lado de uma dica de teclado.
+
+1. `PRODUCT.md` escrito com o gestor — quem usa, em que cena, com que restrições.
+2. Direção visual escolhida pelo gestor entre quatro cartas: **Painel Split-Flap** de
+   estação. O encaixe não é decorativo — `prazo_ancora` ("dia 10", "dia 20") já é a
+   coluna HORÁRIO de um painel de partidas.
+3. Cinco telas reconstruídas como quatro modos de um mesmo painel.
+4. Revisão de acabamento independente: 7 achados, todos corrigidos e pontuados.
+5. `DESIGN.md` e `.impeccable/design.json` gravados A PARTIR do que foi construído.
+
+**Duas medições que mudaram decisões:**
+
+- O validador de paleta reprovou verde × vermelho com ΔE 4,2 em deuteranopia. Os
+  gráficos de evolução ficaram **acromáticos** — direção por inclinação, número com
+  sinal e hachura.
+- Contraste de rótulo sobre a chapa clara media **1,7:1**. Corrigido remapeando tokens
+  dentro dos materiais, então o próximo componente que cair sobre aço já nasce legível.
+
+---
+
+### Sessão de 28 de setembro de 2026 — terceira leva: correções e cadastro
+
+Feita a partir de uma especificação do gestor com 11 prioridades.
+
+| Prioridade | O que era | Resultado |
+|---|---|---|
+| 1 | Tela preta infinita no painel de risco | ✅ Causa raiz corrigida — decisão 6.13 |
+| 2–4 | Cadastro de pessoas, tarefas e o vínculo entre eles | ✅ Quatro rotas em `/gerenciar` |
+| 5–6 | Descobrir QUEM tem cada capacidade | ✅ Popover `Explicacao`, hover + clique + teclado |
+| 7–8 | Aviso de baixa confiabilidade sem destaque | ✅ Um componente, dois tons |
+| 9 | Remover header fixo | ✅ Mesma correção da prioridade 1 |
+| 10 | Dark/light mode | ✅ Tema claro, persistido, sem piscar |
+| 11 | Consistência visual | ✅ Detector de design em zero achados |
+| extra | Virada mensal automática pela data do servidor | ✅ `lib/db/ciclo-vigente.ts` |
+
+**Três bugs que só apareceram porque houve verificação no navegador de verdade:**
+
+1. **A tela preta.** Reproduzida com CDP antes de tocar em código: `window.scrollY`
+   chegou a 2700 numa página que deveria ter rolagem zero. A captura mostrou viewport
+   inteiro preto com barra de rolagem real.
+2. **Colaborador criado sem nenhuma célula.** Cadastrei alguém pela interface e ela
+   ficou com 0 de 64 células. Causa: `garantirCicloDoMes()` perseguia o mês do relógio,
+   que estava fechado. Levou à decisão 6.16.
+3. **Chapa do topo transbordando sobre a navegação no celular.** `h-16` fixo com conteúdo
+   quebrando em três linhas. Virou `min-h-16`.
+
+**O teste de aceite, feito pela interface:** desliguei o Luis e a cobertura do mês
+corrente caiu de 76,04% para 64,19%, as tarefas que param subiram de 12 para 20, e o mês
+fechado anterior ficou intacto em 73,57%. Readmitido, tudo voltou.
+
+**Migrations novas:** `0002_vigencia_e_heranca` (view `v_nivel_vigente`, enum `herdado`,
+toda a camada acima refeita) e `0003_vigencia_sem_inicio` (conserta um erro da 0002 que
+apagava o histórico anterior à data de hoje).
+
+**Script novo:** `scripts/realinhar-ciclos.ts` — desloca os ciclos do seed para alinhar
+com o relógio. Rodado nesta sessão: os ciclos eram ago/set/out com outubro aberto e
+passaram a jul/ago/**set aberto**. Só é legítimo porque os níveis são sintéticos.
+
+**Resultado:** 39 testes passando, `tsc` e `lint` limpos, 9 rotas servindo 200, detector
+de design em zero, rolagem fantasma zero em 18 combinações de rota e tema.
+
+---
+
+### Sessão de 28 de setembro de 2026 — quarta leva: ajustes do gestor e handoff
+
+Duas correções pedidas depois de usar o sistema, e a documentação completa.
+
+**1. O toggle de tema dizia "Painel" e "Impresso".** Era jargão do mundo visual vazando
+para a interface — pedia ao usuário aprender a metáfora de quem desenhou antes de trocar
+uma configuração. Agora diz **Claro** e **Escuro**, com sol e lua desenhados no sistema
+de ícones do projeto. A metáfora continua governando como cada tema é CONSTRUÍDO; ela só
+deixou de ser rótulo. Registrado no DESIGN.md, em "The Two Artefacts Rule".
+
+**2. Os ciclos não seguiam a data do servidor** — o gestor viu outubro aberto e setembro
+fechado, com o relógio marcando setembro. Era erro meu: numa leva anterior eu tinha
+escrito "o ciclo vigente é o mais recente" para contornar um seed com datas fixas, o que
+é o oposto da regra do produto. Corrigido em três frentes, ver decisão 6.16:
+
+- a regra ficou dura — o vigente é o do mês do relógio, sem exceção;
+- ciclo à frente do calendário virou **anomalia denunciada em vermelho** na tela de
+  ciclos, com a instrução do conserto;
+- o `seed-dev` passou a gerar datas relativas, e `scripts/realinhar-ciclos.ts` conserta
+  bancos já semeados. Rodado: os ciclos foram de ago/set/out (outubro aberto) para
+  jul/ago/**set aberto**.
+
+**3. Documentação de handoff.** Este arquivo ganhou:
+
+- **0.1 — COMECE POR AQUI**, a retomada em cinco minutos, com a ordem de leitura;
+- **0.2 — Como o dado flui**, o diagrama da fonte única de verdade;
+- **7.2 — As sete armadilhas desta stack**, cada uma com o sintoma e a causa;
+- inventário completo dos arquivos novos (4.2, 4.4, 4.5);
+- rastreabilidade atualizada (objetivos 1, 2 e 5 mudaram de estado).
+
+**Resultado:** 39 testes passando, `tsc` e `lint` limpos, 9 rotas servindo 200, detector
+de design em zero achados, ciclo vigente batendo com o relógio.
+
+---
+
 ### Como manter este arquivo
 
 Ao fechar uma sessão de trabalho, atualize:
@@ -727,7 +1153,9 @@ Ao fechar uma sessão de trabalho, atualize:
 - a **seção 7**, se algo custou mais de meia hora para descobrir;
 - a **seção 8**, com o que foi verificado e como;
 - a **seção 10**, removendo o que foi feito e detalhando o que apareceu;
-- a **seção 13**, com uma entrada nova.
+- a **seção 13**, com uma entrada nova;
+- o **`semaforo/DESIGN.md`**, se o sistema visual mudou — ele descreve o que ships, não
+  o que se pretendia. Rode `impeccable detect --json app` para saber se divergiu.
 
 O `BACKLOG.md` dentro de `semaforo/` continua sendo a fila de ideias soltas. **Este
 arquivo é a fonte de verdade sobre o estado.** Quando os dois discordarem, este vale.

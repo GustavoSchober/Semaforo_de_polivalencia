@@ -73,15 +73,33 @@ Nenhuma bloqueia o trabalho atual, mas as três primeiras mudam fórmulas.
 
 ## Front end — pendências
 
+> O estado completo, com o porquê de cada decisão, está em
+> `../ESTADO-DO-PROJETO.md`. Aqui ficam só os itens soltos.
+
 - [ ] **Cadastro de setor não tem tela.** Pessoa, tarefa e ciclo têm; setor
       continua por SQL, então uma tarefa nova só entra em setor que já existe.
+      O caminho está pavimentado: `setoresDoDepartamento()` já existe em
+      `lib/db/consultas/administracao.ts`, e o padrão `Gaveta` + `Formulario` +
+      Server Action está estabelecido em `app/gerenciar/`.
 - [ ] **O cabeçalho de coluna da matriz não gruda mais.** Foi removido junto com
-      o shell de altura fixa, que era a causa da tela preta. Em 64 linhas, perder
-      os nomes das colunas ao rolar incomoda; refazer exige um scrollport que não
-      reintroduza o bug.
-- [ ] Nenhuma tela foi inspecionada em build de produção — todas as capturas são
-      `next dev`. Rodar `npm run build && npm start` e revisar.
-- [ ] O cabeçalho de aço quebra em três linhas a 390px.
+      o invólucro de altura fixa, que era a causa da tela preta. Em 64 linhas,
+      perder os nomes das colunas ao rolar incomoda. **Antes de tentar refazer,
+      leia a armadilha 1 da seção 7.2 do ESTADO-DO-PROJETO** — `overflow-x-auto`
+      vira scrollport e quebra o `sticky`.
+- [ ] **Nenhuma tela foi inspecionada em build de produção.** Todas as capturas
+      são `next dev`. Rodar `npm run build && npm start` e revisar.
+- [ ] O cabeçalho de aço quebra em três linhas a 390px e empurra a primeira
+      linha de dados para baixo. Celular é v2 declarada pelo gestor.
+- [ ] **Tela "quem pode me ensinar isto", partindo da PESSOA.** Os popovers já
+      respondem partindo da TAREFA. É o objetivo 5 da documentação funcional, e
+      é o que faz o colaborador abrir a ferramenta por vontade própria.
+- [ ] A linha do contador de cobertura no painel alinha os dígitos numa coluna
+      diferente das quatro fileiras abaixo. Lê como cabeçalho, que é o que ele é
+      — mas alinhar faria a faixa virar um objeto só.
+- [ ] **Reabertura de ciclo não fica registrada.** Hoje reabrir é só
+      `status = 'aberto', fechado_em = null`, e a informação de que houve
+      reabertura se perde. A arquitetura pede registro. Precisa de decisão:
+      bastam os campos atuais, ou entra tabela de auditoria?
 
 ## Front end — pendências da reconstrução anterior
 

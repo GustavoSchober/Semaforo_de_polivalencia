@@ -39,21 +39,19 @@ export type CicloVigente = {
 export async function garantirCicloDoMes(
   departamentoId: number,
 ): Promise<CicloVigente | null> {
-  // O ciclo vigente é o MAIS RECENTE, não o do mês do relógio.
+  // O ciclo vigente é o DO MÊS DO RELÓGIO. Sem exceção.
   //
-  // Parece a mesma coisa e não é: um ciclo pode existir adiante do calendário
-  // (o seed do projeto abre outubro enquanto o relógio ainda diz setembro), e
-  // uma função que perseguisse o mês corrente devolveria setembro — fechado —
-  // como se fosse o ciclo de trabalho. Foi exatamente esse o defeito que
-  // deixou um colaborador recém-cadastrado sem nenhuma célula: ele foi
-  // cadastrado no ciclo errado, que por cima estava fechado.
+  // Uma versão anterior desta função devolvia o ciclo mais recente, para
+  // conviver com um seed que abria outubro enquanto o relógio dizia setembro.
+  // Era contornar o sintoma: o mês em andamento ficava fechado e um mês futuro
+  // ficava aberto, que é exatamente o contrário da regra do produto — o mês
+  // corrente permanece aberto e editável até acabar.
   //
-  // A regra é: se já existe ciclo igual ou posterior ao mês corrente, ele é o
-  // vigente. Só quando o mais recente ficou para trás é que o mês virou.
-  const maisRecente = await cicloMaisRecente(departamentoId);
-  if (maisRecente && maisRecente.referencia >= primeiroDiaDoMes()) {
-    return { ...maisRecente, viradoAgora: false };
-  }
+  // Um ciclo à frente do calendário é anomalia de dado, não estado de trabalho.
+  // Ele é detectado e denunciado por `ciclosNoFuturo()`, nunca tratado como
+  // vigente.
+  const doMes = await buscarCicloDoMes(departamentoId);
+  if (doMes) return { ...doMes, viradoAgora: false };
 
   return db.transaction(async (tx) => {
     // serializa a virada entre requisições concorrentes; liberado no commit
@@ -66,9 +64,7 @@ export async function garantirCicloDoMes(
       select id, referencia::text, status, departamento_id
       from ciclo
       where departamento_id = ${departamentoId}
-        and referencia >= date_trunc('month', current_date)::date
-      order by referencia desc
-      limit 1
+        and referencia = date_trunc('month', current_date)::date
     `);
     if (jaExiste) return { ...mapear(jaExiste), viradoAgora: false };
 
@@ -142,22 +138,37 @@ function mapear(l: LinhaCiclo) {
   };
 }
 
-/** O primeiro dia do mês corrente, no fuso do servidor, em ISO. */
-function primeiroDiaDoMes() {
-  const hoje = new Date();
-  const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-  return `${hoje.getFullYear()}-${mes}-01`;
-}
-
-async function cicloMaisRecente(departamentoId: number) {
+async function buscarCicloDoMes(departamentoId: number) {
   const [l] = await db.execute<LinhaCiclo>(sql`
     select id, referencia::text, status, departamento_id
     from ciclo
     where departamento_id = ${departamentoId}
-    order by referencia desc
-    limit 1
+      and referencia = date_trunc('month', current_date)::date
   `);
   return l ? mapear(l) : null;
+}
+
+/**
+ * Ciclos com referência adiante do mês corrente.
+ *
+ * Não deveriam existir: a virada é automática e só cria o mês do relógio. Se
+ * aparecem, alguém inseriu à mão ou um seed foi escrito com datas fixas — e o
+ * sintoma é o mês em andamento aparecer fechado enquanto um mês futuro aparece
+ * aberto. A tela de ciclos denuncia em vez de esconder.
+ */
+export async function ciclosNoFuturo(departamentoId: number) {
+  const linhas = await db.execute<{ id: string; referencia: string; status: string }>(sql`
+    select id, referencia::text, status
+    from ciclo
+    where departamento_id = ${departamentoId}
+      and referencia > date_trunc('month', current_date)::date
+    order by referencia
+  `);
+  return linhas.map((l) => ({
+    id: Number(l.id),
+    referencia: l.referencia,
+    status: l.status,
+  }));
 }
 
 /**

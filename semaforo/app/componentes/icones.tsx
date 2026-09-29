@@ -77,6 +77,25 @@ export function IconeSeta({ className }: Props) {
   );
 }
 
+/** Tema claro. */
+export function IconeSol({ className }: Props) {
+  return (
+    <Base className={className}>
+      <circle cx="8" cy="8" r="3.1" />
+      <path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.15 1.15M11.45 11.45l1.15 1.15M12.6 3.4l-1.15 1.15M4.55 11.45L3.4 12.6" />
+    </Base>
+  );
+}
+
+/** Tema escuro. */
+export function IconeLua({ className }: Props) {
+  return (
+    <Base className={className}>
+      <path d="M13 9.6A5.6 5.6 0 0 1 6.4 3a5.7 5.7 0 1 0 6.6 6.6Z" />
+    </Base>
+  );
+}
+
 /** Informação: o que há por trás de um número. Desenhado, não a letra "i". */
 export function IconeInfo({ className }: Props) {
   return (

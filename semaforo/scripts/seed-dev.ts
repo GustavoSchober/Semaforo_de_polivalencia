@@ -22,7 +22,24 @@ const PESSOAS = [
   { nome: 'José Junior', papel: 'colaborador' as const, forca: 0.35 },
 ];
 
-const CICLOS = ['2026-08-01', '2026-09-01', '2026-10-01'];
+/**
+ * Três ciclos terminando no MÊS CORRENTE — relativos ao relógio, nunca datas
+ * fixas.
+ *
+ * Com datas fixas o seed envelhece: quando o calendário passa delas, o mês em
+ * andamento fica sem ciclo e o último ciclo do seed vira um mês futuro aberto.
+ * É o estado incoerente que apareceu na aplicação — setembro fechado e outubro
+ * aberto, com o relógio marcando setembro.
+ */
+function ultimosTresMeses(): string[] {
+  const hoje = new Date();
+  return [2, 1, 0].map((atras) => {
+    const d = new Date(hoje.getFullYear(), hoje.getMonth() - atras, 1);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-01`;
+  });
+}
+
+const CICLOS = ultimosTresMeses();
 
 /** Gerador determinístico: o mesmo seed produz sempre a mesma matriz. */
 function aleatorio(semente: number) {
