@@ -3,12 +3,23 @@ import { db } from "@/lib/db";
 import { departamento } from "@/lib/db/schema";
 import { garantirCicloDoMes } from "@/lib/db/ciclo-vigente";
 import { colaboradoresDoDepartamento } from "@/lib/db/consultas/administracao";
+import {
+  expurgarDesligados,
+  historicoDoDesligado,
+  type HistoricoDesligado,
+} from "@/lib/db/consultas/desligados";
+import {
+  RETENCAO_DESLIGADO_MESES,
+  ROTULO_NIVEL,
+  type Nivel,
+} from "@/lib/dominio/constantes";
 import { usuarioAtual } from "@/lib/auth/sessao";
 import { podeAdministrar } from "@/lib/auth/permissoes";
 import { Painel } from "@/app/componentes/moldura";
 import { AvisoDeServico } from "@/app/componentes/aviso";
 import { IconeSeta } from "@/app/componentes/icones";
-import { referenciaTitulo } from "@/app/componentes/formato";
+import { PalhetaFixa } from "@/app/componentes/palheta-fixa";
+import { referenciaTitulo, referenciaLegivel } from "@/app/componentes/formato";
 import {
   alternarDesligamento,
   criarColaborador,
@@ -40,12 +51,31 @@ export default async function Equipe() {
   }
 
   const ciclo = await garantirCicloDoMes(dep.id);
+
+  // Esta é a tela em que o expurgo aparece, então é aqui que ele roda — além da
+  // virada do mês. Quem passou dos três meses de retenção some da lista de
+  // desligados nesta mesma renderização, e não na próxima virada.
+  await expurgarDesligados(dep.id);
+
   const u = await usuarioAtual();
   const podeMexer = podeAdministrar(u, dep.id);
   const pessoas = await colaboradoresDoDepartamento(dep.id, ciclo?.id ?? null);
 
   const ativos = pessoas.filter((p) => p.ativo);
   const inativos = pessoas.filter((p) => !p.ativo);
+
+  // o quadro que cada desligado deixou, para a gaveta de histórico
+  const historicos = new Map<number, HistoricoDesligado | null>(
+    await Promise.all(
+      inativos.map(
+        async (p) =>
+          [p.id, await historicoDoDesligado(p.id)] as [
+            number,
+            HistoricoDesligado | null,
+          ],
+      ),
+    ),
+  );
 
   return (
     <Painel
@@ -69,9 +99,12 @@ export default async function Equipe() {
               Quem está no departamento
             </h1>
             <p className="conteudo mt-3.5 text-[0.9375rem] leading-relaxed text-aco">
-              Cadastrar alguém abre o quadro dela no ciclo aberto. Desligar não apaga
-              nada: grava a data de saída, a pessoa para de contar no mês corrente na
-              hora, e os meses já fechados continuam dizendo o que era verdade neles.
+              Cadastrar alguém abre o quadro dela no ciclo aberto. Desligar tira a
+              pessoa da matriz, do painel, do simulador e da evolução na hora — os
+              meses anteriores ao da saída continuam dizendo o que era verdade neles.
+              O quadro que ela deixou fica aqui, na gaveta de histórico, por{" "}
+              {RETENCAO_DESLIGADO_MESES} meses; passado o prazo, cadastro e níveis são
+              apagados do banco e a readmissão deixa de ser possível.
             </p>
           </div>
 
@@ -138,9 +171,10 @@ export default async function Equipe() {
         {inativos.length > 0 && (
           <ListaDePessoas
             titulo="Desligados"
-            descricao="Continuam no histórico dos ciclos em que estavam, e não contam mais no mês corrente."
+            descricao={`Já não aparecem em nenhuma outra tela. O quadro de cada um fica em "Histórico" até a data de expurgo, e nessa data some do banco junto com a opção de readmitir.`}
             pessoas={inativos}
             podeMexer={podeMexer}
+            historicos={historicos}
             vazio=""
           />
         )}
@@ -155,12 +189,14 @@ function ListaDePessoas({
   pessoas,
   podeMexer,
   vazio,
+  historicos,
 }: {
   titulo: string;
   descricao?: string;
   pessoas: Awaited<ReturnType<typeof colaboradoresDoDepartamento>>;
   podeMexer: boolean;
   vazio: string;
+  historicos?: Map<number, HistoricoDesligado | null>;
 }) {
   return (
     <section className="mt-12">
@@ -189,9 +225,19 @@ function ListaDePessoas({
                     </span>
                     <span className="rotulo">{p.papel}</span>
                     {!p.ativo && (
-                      <span className="rotulo-forte border border-aco-escuro/60 px-1.5 py-0.5 text-[0.5625rem] text-aco">
-                        saiu em {p.saidaEm}
-                      </span>
+                      <>
+                        <span className="rotulo-forte border border-aco-escuro/60 px-1.5 py-0.5 text-[0.5625rem] text-aco">
+                          saiu em {p.saidaEm}
+                        </span>
+                        {p.expiraEm && (
+                          <span
+                            className="rotulo-forte border border-vermelho px-1.5 py-0.5 text-[0.5625rem] text-vermelho-tinta"
+                            title={`Em ${p.expiraEm} o cadastro e os níveis desta pessoa são apagados do banco, e a readmissão deixa de ser possível.`}
+                          >
+                            apaga em {p.expiraEm}
+                          </span>
+                        )}
+                      </>
                     )}
                   </span>
                   {p.email && (
@@ -224,8 +270,15 @@ function ListaDePessoas({
                   </dl>
                 )}
 
-                {podeMexer && (
-                  <div className="flex flex-wrap items-start gap-2">
+                <div className="flex flex-wrap items-start gap-2">
+                  {!p.ativo && (
+                    <Gaveta rotulo="Histórico">
+                      <QuadroDeixado nome={p.nome} historico={historicos?.get(p.id) ?? null} />
+                    </Gaveta>
+                  )}
+
+                  {podeMexer && (
+                  <>
                     <Gaveta rotulo="Editar">
                       <Formulario acao={editarColaborador} enviar="Salvar">
                         <input type="hidden" name="id" value={p.id} />
@@ -270,19 +323,99 @@ function ListaDePessoas({
                       }
                       confirmar={
                         p.ativo
-                          ? `Desligar ${p.nome}? Os indicadores do mês corrente vão recalcular sem essa pessoa. Os ciclos fechados não mudam, e a ação pode ser desfeita.`
+                          ? `Desligar ${p.nome}? A pessoa sai da matriz, do painel, do simulador e da evolução imediatamente, e os indicadores do mês corrente recalculam sem ela. Os meses anteriores ao da saída não mudam. O quadro dela fica em "Histórico" por ${RETENCAO_DESLIGADO_MESES} meses — até lá a ação pode ser desfeita; depois, não.`
                           : undefined
                       }
                     >
                       {p.ativo ? "Desligar" : "Readmitir"}
                     </BotaoDeAcao>
-                  </div>
-                )}
+                  </>
+                  )}
+                </div>
               </div>
             </li>
           ))}
         </ul>
       )}
     </section>
+  );
+}
+
+/**
+ * O quadro que a pessoa deixou — a mesma informação da matriz, para uma pessoa
+ * só, no último ciclo em que ela foi avaliada.
+ *
+ * Só as tarefas em que ela chegou a algum nível. Imprimir as 64 linhas, 50 delas
+ * em zero, transformaria a resposta ("o que ela fazia que ninguém mais faz?")
+ * numa lista para rolar. O zero já está dito pela ausência.
+ */
+function QuadroDeixado({
+  nome,
+  historico,
+}: {
+  nome: string;
+  historico: HistoricoDesligado | null;
+}) {
+  if (!historico) {
+    return (
+      <p className="conteudo text-[0.8125rem] leading-relaxed text-aco">
+        Não há nível avaliado para {nome} em nenhum ciclo. Não ficou quadro para
+        guardar.
+      </p>
+    );
+  }
+
+  const porSetor = Object.entries(
+    Object.groupBy(historico.linhas, (l) => l.setor),
+  ) as [string, typeof historico.linhas][];
+
+  return (
+    <div>
+      <p className="conteudo max-w-[70ch] text-[0.8125rem] leading-relaxed text-aco">
+        Último quadro avaliado, em{" "}
+        <strong className="text-tinta">
+          {referenciaLegivel(historico.referencia)}
+        </strong>
+        . São {historico.linhas.length} tarefas em que {nome} tinha algum nível — as
+        demais estavam em zero.
+      </p>
+
+      <dl className="mt-4 flex flex-wrap gap-x-8 gap-y-2">
+        <div>
+          <dt className="rotulo">Executava sozinho</dt>
+          <dd className="dado mt-1 text-[1.0625rem]">{historico.executaSozinho}</dd>
+        </div>
+        <div>
+          <dt className="rotulo">Sabia ensinar</dt>
+          <dd className="dado mt-1 text-[1.0625rem]">{historico.ensina}</dd>
+        </div>
+      </dl>
+
+      <div className="mt-5 space-y-5">
+        {porSetor.map(([setor, linhas]) => (
+          <div key={setor}>
+            <span className="placa block border-y border-aco-escuro/45 py-1 text-[0.6875rem] text-tinta">
+              {setor}
+            </span>
+            <ul>
+              {linhas.map((l) => (
+                <li
+                  key={l.descricao}
+                  className="junta flex flex-wrap items-center gap-x-4 gap-y-1 py-1.5"
+                >
+                  <PalhetaFixa largura={22} altura={26} titulo={ROTULO_NIVEL[l.valor as Nivel]}>
+                    {l.valor}
+                  </PalhetaFixa>
+                  <span className="conteudo min-w-[20rem] grow text-[0.8125rem] leading-snug text-tinta">
+                    {l.descricao}
+                  </span>
+                  <span className="rotulo normal-case">{ROTULO_NIVEL[l.valor as Nivel]}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

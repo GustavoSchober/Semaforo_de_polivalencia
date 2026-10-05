@@ -21,6 +21,7 @@ import {
   CelulaFarol,
   Lampada,
   LegendaFarol,
+  LegendaNiveis,
   PlacaSituacao,
 } from "@/app/componentes/farol";
 import {
@@ -405,8 +406,9 @@ export default async function PainelDeRisco({
 
         <Secao
           titulo="Semáforo completo"
-          descricao="O catálogo inteiro, setor a setor. Leia na horizontal: o nível 1 é quem tem contato, o 3 é a cobertura operacional real, e o 4 é a capacidade de formar sucessor. A lâmpada acompanha o nível 3."
+          descricao="O catálogo inteiro, setor a setor. As quatro colunas contam PESSOAS, não níveis, e são cumulativas: quem sabe ensinar (4) também é contado em 3, 2 e 1. Por isso três pessoas no nível 4 imprimem 3 · 3 · 3 · 3 — é a mesma trinca contada quatro vezes, e não doze pessoas. A lâmpada e a lista de nomes acompanham o nível 3."
         >
+          <LegendaNiveis className="mb-6" />
           <div className="space-y-10">
             {porSetor.map(([setor, linhasDoSetor]) => (
               <div key={setor}>
@@ -418,8 +420,32 @@ export default async function PainelDeRisco({
                 </div>
                 <table className="w-full border-separate border-spacing-0 text-left">
                   <caption className="sr-only">
-                    Semáforo do setor {setor}: pessoas por nível em cada tarefa.
+                    Semáforo do setor {setor}: quantas pessoas atingem cada nível ou
+                    acima, em cada tarefa.
                   </caption>
+                  {/* Sem este cabeçalho as quatro células eram quatro números sem
+                      dono. É o que fazia "3 3 3 3" ser lido como quatro pessoas em
+                      vez de uma mesma trinca contada em quatro níveis. */}
+                  <thead>
+                    <tr>
+                      <td className="w-28" />
+                      <td />
+                      <td className="w-44 pb-1">
+                        <span className="flex items-center justify-end gap-1">
+                          {([1, 2, 3, 4] as const).map((n) => (
+                            <span
+                              key={n}
+                              className="dado w-[26px] shrink-0 text-center text-[0.5625rem] tracking-wider text-aco-escuro uppercase"
+                              title={`Pessoas em nível ${n} ou acima — ${ROTULO_NIVEL[n].toLowerCase()}`}
+                            >
+                              N{n}
+                            </span>
+                          ))}
+                        </span>
+                      </td>
+                      <td className="w-14" />
+                    </tr>
+                  </thead>
                   <tbody>
                     {linhasDoSetor.map((l) => (
                       <tr key={l.tarefaId} className="junta">
@@ -444,7 +470,7 @@ export default async function PainelDeRisco({
                           <span className="flex justify-end">
                             <Explicacao
                               alinhar="direita"
-                              titulo={`Quem está nesta tarefa — ${l.descricao}`}
+                              titulo={`Quem está nesta tarefa, com o nível de cada um — ${l.descricao}`}
                               vazio="Ninguém foi avaliado nesta tarefa."
                               rotulo={<Lampada pessoas={l.nivel3} />}
                             >
@@ -454,6 +480,7 @@ export default async function PainelDeRisco({
                                   <LinhaDePessoa
                                     key={p.colaboradorId}
                                     nome={p.nome}
+                                    nivel={p.valor}
                                     nota={ROTULO_NIVEL[p.valor as Nivel]}
                                     herdado={p.herdado}
                                   />
@@ -509,6 +536,7 @@ function QuemFaz({
         <LinhaDePessoa
           key={p.colaboradorId}
           nome={p.nome}
+          nivel={p.valor}
           nota={ROTULO_NIVEL[p.valor as Nivel]}
           herdado={p.herdado}
         />

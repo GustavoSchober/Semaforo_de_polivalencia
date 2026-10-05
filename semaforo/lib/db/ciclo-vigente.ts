@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import { db } from '@/lib/db';
+import { expurgarDesligados } from '@/lib/db/consultas/desligados';
 
 export type CicloVigente = {
   id: number;
@@ -53,7 +54,7 @@ export async function garantirCicloDoMes(
   const doMes = await buscarCicloDoMes(departamentoId);
   if (doMes) return { ...doMes, viradoAgora: false };
 
-  return db.transaction(async (tx) => {
+  const vigente = await db.transaction(async (tx) => {
     // serializa a virada entre requisições concorrentes; liberado no commit
     await tx.execute(
       sql`select pg_advisory_xact_lock(hashtext('virada-de-ciclo:' || ${departamentoId}::text))`,
@@ -120,6 +121,17 @@ export async function garantirCicloDoMes(
 
     return { ...mapear(novo), viradoAgora: true };
   });
+
+  // A virada é o relógio deste sistema: é nela que o prazo de retenção de quem
+  // saiu vence. Fora da transação de propósito — um expurgo que falhasse não
+  // pode desfazer a abertura do mês.
+  try {
+    await expurgarDesligados(departamentoId);
+  } catch (e) {
+    console.error('expurgo de desligados na virada do mês', e);
+  }
+
+  return vigente;
 }
 
 type LinhaCiclo = {

@@ -28,3 +28,14 @@ export type Nivel = 0 | 1 | 2 | 3 | 4;
 export function ehNivelValido(v: number): v is Nivel {
   return Number.isInteger(v) && v >= NIVEL_MIN && v <= NIVEL_MAX;
 }
+
+/**
+ * Por quantos meses o quadro de quem saiu continua no banco.
+ *
+ * Depois disso a pessoa é apagada de verdade — níveis, cadastro e a própria
+ * possibilidade de readmitir. É o único expurgo do sistema, e existe porque a
+ * alternativa é guardar para sempre 64 células por pessoa que não trabalha mais
+ * aqui. Três meses é o prazo em que uma readmissão ainda é plausível e em que
+ * uma auditoria de desligamento ainda é feita.
+ */
+export const RETENCAO_DESLIGADO_MESES = 3;

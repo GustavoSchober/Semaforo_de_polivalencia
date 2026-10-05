@@ -575,6 +575,7 @@ function QuemCobre({
         <LinhaDePessoa
           key={p.colaboradorId}
           nome={p.nome}
+          nivel={p.valor}
           nota={ROTULO_NIVEL[p.valor as Nivel]}
           herdado={p.herdado}
         />

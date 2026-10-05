@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import { db } from '@/lib/db';
+import { RETENCAO_DESLIGADO_MESES } from '@/lib/dominio/constantes';
 
 /**
  * As consultas que alimentam as telas de cadastro.
@@ -17,6 +18,8 @@ export type ColaboradorAdmin = {
   papel: 'colaborador' | 'gestor' | 'diretoria';
   entradaEm: string | null;
   saidaEm: string | null;
+  /** quando o cadastro e o histórico desta pessoa serão apagados do banco */
+  expiraEm: string | null;
   ativo: boolean;
   /** medidos no ciclo aberto; zero quando a pessoa já saiu */
   executaSozinho: number;
@@ -35,6 +38,7 @@ export async function colaboradoresDoDepartamento(
     papel: ColaboradorAdmin['papel'];
     entrada_em: string | null;
     saida_em: string | null;
+    expira_em: string | null;
     executa_sozinho: number;
     ensina: number;
     pendentes: number;
@@ -42,6 +46,7 @@ export async function colaboradoresDoDepartamento(
     select
       c.id, c.nome, c.email, c.papel,
       c.entrada_em::text, c.saida_em::text,
+      (c.saida_em + make_interval(months => ${RETENCAO_DESLIGADO_MESES}::int))::date::text as expira_em,
       coalesce(count(*) filter (where n.avaliado and n.valor >= 3), 0)::int as executa_sozinho,
       coalesce(count(*) filter (where n.avaliado and n.valor  = 4), 0)::int as ensina,
       coalesce(count(*) filter (where not n.avaliado), 0)::int             as pendentes
@@ -61,6 +66,7 @@ export async function colaboradoresDoDepartamento(
     papel: l.papel,
     entradaEm: l.entrada_em,
     saidaEm: l.saida_em,
+    expiraEm: l.expira_em,
     ativo: l.saida_em === null,
     executaSozinho: l.executa_sozinho,
     ensina: l.ensina,

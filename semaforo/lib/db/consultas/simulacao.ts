@@ -95,7 +95,7 @@ export async function pessoasDoCiclo(cicloId: number): Promise<PessoaSimulavel[]
            count(*) filter (where not n.avaliado)::int as pendentes,
            count(*)::int as total
     from colaborador c
-    join nivel n on n.colaborador_id = c.id and n.ciclo_id = ${cicloId}
+    join v_nivel_vigente n on n.colaborador_id = c.id and n.ciclo_id = ${cicloId}
     group by c.id, c.nome
     order by c.nome
   `);

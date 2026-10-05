@@ -146,9 +146,16 @@ export async function editarColaborador(fd: FormData): Promise<Resultado> {
 /**
  * Desliga ou readmite.
  *
- * Nunca apaga: grava a data de saída. A partir dela, `v_nivel_vigente` deixa de
- * contar a pessoa nos ciclos cuja referência é POSTERIOR à saída — o mês aberto
- * recalcula na hora, e os meses fechados continuam intactos.
+ * Desligar não apaga: grava a data de saída. A partir dela, `v_nivel_vigente`
+ * para de contar a pessoa já no ciclo do MÊS DA SAÍDA — matriz, painel,
+ * simulador e evolução perdem a pessoa no mesmo instante, e os meses anteriores
+ * continuam dizendo o que era verdade neles. O quadro que ela deixou fica na
+ * gaveta de histórico da tela de cadastro por `RETENCAO_DESLIGADO_MESES` meses,
+ * e só então é apagado de verdade.
+ *
+ * Readmitir reabre as células do ciclo em andamento. Sem isso, quem foi
+ * readmitido depois de uma virada do mês voltaria sem quadro nenhum: a virada
+ * monta o produto cartesiano só de quem estava no departamento naquele dia.
  */
 export async function alternarDesligamento(fd: FormData): Promise<Resultado> {
   const ctx = await contexto();
@@ -162,11 +169,30 @@ export async function alternarDesligamento(fd: FormData): Promise<Resultado> {
   }
 
   const desligar = fd.get('acao') === 'desligar';
-  await db.execute(sql`
+  const [alterado] = await db.execute<{ id: string }>(sql`
     update colaborador
     set saida_em = ${desligar ? sql`current_date` : sql`null`}
     where id = ${id} and departamento_id = ${ctx.departamentoId}
+    returning id
   `);
+
+  if (!alterado) {
+    return {
+      ok: false,
+      erro: 'Colaborador não encontrado. Ele pode já ter passado do prazo de retenção e sido apagado.',
+    };
+  }
+
+  if (!desligar && ctx.cicloAberto) {
+    await db.execute(sql`
+      insert into nivel (ciclo_id, tarefa_id, colaborador_id, valor, avaliado, origem)
+      select ${ctx.cicloAberto}, t.id, ${id}, 0, false, 'gestor'
+      from tarefa t
+      join setor s on s.id = t.setor_id and s.departamento_id = ${ctx.departamentoId}
+      where t.ativa_ate is null
+      on conflict do nothing
+    `);
+  }
 
   revalidarTudo();
   return { ok: true };

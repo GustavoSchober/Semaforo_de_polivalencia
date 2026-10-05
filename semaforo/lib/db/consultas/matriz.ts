@@ -26,6 +26,10 @@ export type TarefaDaMatriz = {
  * Duas consultas e uma montagem em memória, em vez de um join que devolveria
  * 320 linhas para a interface remontar. Nesta escala a diferença é irrelevante
  * e a forma do retorno é a forma da tela.
+ *
+ * Lê de `v_nivel_vigente`, nunca de `nivel` cru. É o que mantém a matriz igual
+ * ao painel: quem foi desligado some da grade no mesmo instante em que some dos
+ * indicadores, em vez de continuar ocupando uma coluna de zeros.
  */
 export async function matrizDoCiclo(cicloId: number): Promise<{
   pessoas: PessoaDaMatriz[];
@@ -40,7 +44,7 @@ export async function matrizDoCiclo(cicloId: number): Promise<{
     select c.id, c.nome, c.papel,
            count(*) filter (where not n.avaliado)::int as pendentes
     from colaborador c
-    join nivel n on n.colaborador_id = c.id and n.ciclo_id = ${cicloId}
+    join v_nivel_vigente n on n.colaborador_id = c.id and n.ciclo_id = ${cicloId}
     group by c.id, c.nome, c.papel
     order by c.id
   `);
@@ -62,7 +66,7 @@ export async function matrizDoCiclo(cicloId: number): Promise<{
            t.periodicidade, t.prazo_ancora,
            s.ordem as ordem_setor, t.ordem as ordem_tarefa,
            n.colaborador_id, n.valor, n.avaliado
-    from nivel n
+    from v_nivel_vigente n
     join tarefa t on t.id = n.tarefa_id
     join setor  s on s.id = t.setor_id
     where n.ciclo_id = ${cicloId}

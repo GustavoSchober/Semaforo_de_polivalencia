@@ -13,7 +13,13 @@ export type SerieColaborador = {
   pontos: PontoEvolucao[];
 };
 
-/** A aba `Gráfico`, que deixa de precisar de uma coluna nova a cada mês. */
+/**
+ * A aba `Gráfico`, que deixa de precisar de uma coluna nova a cada mês.
+ *
+ * Só quem está no departamento. A curva de quem saiu não é acompanhada por
+ * ninguém — ela vira histórico de desligamento, e mora na gaveta da pessoa na
+ * tela de cadastro até o expurgo.
+ */
 export async function evolucaoDosColaboradores(
   departamentoId: number,
 ): Promise<SerieColaborador[]> {
@@ -28,6 +34,7 @@ export async function evolucaoDosColaboradores(
     from v_evolucao e
     join colaborador c on c.id = e.colaborador_id
     where e.departamento_id = ${departamentoId}
+      and c.saida_em is null
     order by c.nome, e.referencia
   `);
 

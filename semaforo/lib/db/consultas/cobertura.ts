@@ -45,7 +45,7 @@ export async function celulasPendentes(cicloId: number): Promise<CelulasPendente
   const [l] = await db.execute<{ pendentes: number; total: number }>(sql`
     select count(*) filter (where not avaliado)::int as pendentes,
            count(*)::int as total
-    from nivel where ciclo_id = ${cicloId}
+    from v_nivel_vigente where ciclo_id = ${cicloId}
   `);
   return { pendentes: l?.pendentes ?? 0, total: l?.total ?? 0 };
 }

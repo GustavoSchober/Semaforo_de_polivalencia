@@ -29,6 +29,13 @@
       "when": 1790619348111,
       "tag": "0003_vigencia_sem_inicio",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790619408111,
+      "tag": "0004_desligamento_imediato",
+      "breakpoints": true
     }
   ]
 }

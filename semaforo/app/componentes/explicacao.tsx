@@ -120,27 +120,43 @@ export function Explicacao({
   );
 }
 
-/** Uma pessoa dentro do painel da Explicacao. */
+/**
+ * Uma pessoa dentro do painel da Explicacao.
+ *
+ * O `nivel` é impresso junto do rótulo porque as colunas do semáforo são
+ * CUMULATIVAS: quem está no 4 também é contado no 1, no 2 e no 3. Sem o número,
+ * uma tarefa com três pessoas no nível 4 aparece como "3 3 3 3" e a lista de
+ * nomes parece contradizer a linha — era exatamente essa a leitura errada.
+ *
+ * O separador antes de "herdado" é um caractere de verdade, e não margem: a
+ * margem some quando alguém copia o texto, e "Consegue fazer e ensinarherdado"
+ * foi o resultado.
+ */
 export function LinhaDePessoa({
   nome,
   nota,
+  nivel,
   herdado = false,
 }: {
   nome: string;
   nota?: string;
+  nivel?: number;
   herdado?: boolean;
 }) {
   return (
     <span className="flex items-baseline justify-between gap-4 py-[3px]">
       <span className="conteudo text-[0.8125rem] text-tinta">{nome}</span>
       <span className="rotulo whitespace-nowrap">
+        {nivel !== undefined && (
+          <span className="dado text-tinta">{`nível ${nivel} · `}</span>
+        )}
         {nota}
         {herdado && (
           <span
-            className="ml-2 text-aco-escuro"
+            className="text-aco-escuro"
             title="nível herdado da virada do mês, ainda não confirmado neste ciclo"
           >
-            herdado
+            {" · herdado"}
           </span>
         )}
       </span>
