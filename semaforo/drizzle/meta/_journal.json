@@ -36,6 +36,13 @@
       "when": 1790619408111,
       "tag": "0004_desligamento_imediato",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791320000000,
+      "tag": "0005_senha_de_acesso",
+      "breakpoints": true
     }
   ]
 }

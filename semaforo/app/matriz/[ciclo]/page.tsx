@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { departamento } from "@/lib/db/schema";
 import { matrizDoCiclo } from "@/lib/db/consultas/matriz";
 import { cicloPorId } from "@/lib/db/consultas/ciclos";
-import { usuarioAtual, semAutenticacao } from "@/lib/auth/sessao";
+import { usuarioAtual, semLoginIndividual } from "@/lib/auth/sessao";
 import { podeEditarMatriz } from "@/lib/auth/permissoes";
 import { referenciaTitulo } from "@/app/componentes/formato";
 import { Painel } from "@/app/componentes/moldura";
@@ -67,13 +67,11 @@ export default async function Matriz({
               </AvisoDeServico>
             )}
 
-            {semAutenticacao && (
-              <AvisoDeServico titulo="Sem autenticação">
-                A sessão está fixa em{" "}
-                <strong className="text-tinta">{u.nome}</strong> ({u.papel}).
-                Qualquer pessoa que alcance este servidor escreve na matriz com esse
-                papel. Os dados aqui embasam promoção e desligamento: não sirva esta
-                aplicação fora de localhost até o ADR-005 estar implementado.
+            {semLoginIndividual && (
+              <AvisoDeServico titulo="Acesso compartilhado">
+                Todos entram pela mesma senha e operam como{" "}
+                <strong className="text-tinta">{u.nome}</strong> ({u.papel}). O
+                login individual de gestor e colaborador ainda não existe.
               </AvisoDeServico>
             )}
           </>

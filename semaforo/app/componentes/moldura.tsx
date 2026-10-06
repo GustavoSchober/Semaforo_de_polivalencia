@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { TrocaDeTema } from "./tema";
+import { sair } from "@/app/entrar/actions";
 import {
   IconeEvolucao,
   IconeGerenciar,
@@ -125,6 +126,14 @@ export function Painel({
 
           <div className="ml-auto flex flex-wrap items-center gap-x-4 gap-y-1">
             <TrocaDeTema />
+            <form action={sair}>
+              <button
+                type="submit"
+                className="rotulo cursor-pointer underline-offset-4 hover:text-tinta hover:underline"
+              >
+                Sair
+              </button>
+            </form>
           </div>
 
           {cicloRotulo && (
