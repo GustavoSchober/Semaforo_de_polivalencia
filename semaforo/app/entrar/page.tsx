@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { Lampada } from "@/app/componentes/farol";
 import { Trilho } from "@/app/componentes/moldura";
 import { COOKIE_ACESSO, acessoConfigurado, sessaoValida } from "@/lib/auth/acesso";
+import { destinoSeguro } from "@/lib/auth/destino";
 import { FormularioEntrada } from "./formulario";
 
 export const metadata = { title: "Entrar · Semáforo de Polivalência" };
@@ -13,7 +14,7 @@ export default async function Entrar({ searchParams }: PageProps<"/entrar">) {
 
   // quem já tem sessão não precisa ver a porta
   if (await sessaoValida((await cookies()).get(COOKIE_ACESSO)?.value)) {
-    redirect(destino?.startsWith("/") && !destino.startsWith("//") ? destino : "/");
+    redirect(destinoSeguro(destino));
   }
 
   const configurado = await acessoConfigurado();

@@ -2,6 +2,11 @@ node_modules
 .next
 .git
 .env
-.env.local
+.env.*
+!.env.example
 testes
 *.md
+.impeccable
+# os segredos montam em /run/secrets em tempo de execução; copiá-los para o
+# contexto de build os deixaria gravados numa camada da imagem
+docker/secrets

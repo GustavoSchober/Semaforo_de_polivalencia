@@ -28,6 +28,12 @@ export async function gravarNivel(
   colaboradorId: number,
   valor: number,
 ): Promise<ResultadoGravacao> {
+  // os argumentos chegam do navegador e podem ser qualquer coisa
+  const ids = [cicloId, tarefaId, colaboradorId];
+  if (!ids.every((v) => typeof v === 'number' && Number.isSafeInteger(v) && v > 0)) {
+    return { ok: false, erro: 'Célula inválida.' };
+  }
+
   try {
     const u = await usuarioAtual();
 
@@ -45,7 +51,7 @@ export async function gravarNivel(
     }
 
     if (!ehNivelValido(valor)) {
-      return { ok: false, erro: `Nível inválido: ${valor}. Os valores possíveis são 0 a 4.` };
+      return { ok: false, erro: 'Nível inválido. Os valores possíveis são 0 a 4.' };
     }
 
     const agora = new Date();

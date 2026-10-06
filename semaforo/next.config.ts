@@ -19,12 +19,33 @@ const nextConfig: NextConfig = {
       // O navegador está no domínio da Vercel, e o pedido chega aqui pelo
       // proxy. Sem estas entradas a checagem de CSRF das Server Actions
       // recusaria toda gravação feita pelo domínio público.
+      // Só o domínio deste projeto: `*.vercel.app` aceitaria qualquer app
+      // hospedado na Vercel como origem de uma gravação.
       allowedOrigins: [
-        "*.vercel.app",
+        "semaforo-de-polivalencia.vercel.app",
         ...(process.env.DOMINIOS_PUBLICOS?.split(",").map((d) => d.trim()).filter(Boolean) ?? []),
       ],
     },
   },
+
+  // Os cabeçalhos que o Caddy aplicava, agora na própria aplicação.
+  async headers() {
+    return [
+      {
+        source: "/:caminho*",
+        headers: [
+          // ninguém embute o app num iframe para induzir cliques (clickjacking)
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "same-origin" },
+          { key: "Strict-Transport-Security", value: "max-age=31536000" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+        ],
+      },
+    ];
+  },
+  poweredByHeader: false,
 
   async rewrites() {
     if (!origemServidor) return [];

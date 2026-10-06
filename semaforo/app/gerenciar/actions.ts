@@ -62,6 +62,18 @@ function texto(v: FormDataEntryValue | null, max = 200) {
   return typeof v === 'string' ? v.trim().slice(0, max) : '';
 }
 
+function idValido(v: unknown): v is number {
+  return typeof v === 'number' && Number.isSafeInteger(v) && v > 0;
+}
+
+/** O setor existe E é deste departamento — um id de outro não passa. */
+async function setorDoDepartamento(setorId: number, departamentoId: number) {
+  const [s] = await db.execute(sql`
+    select 1 from setor where id = ${setorId} and departamento_id = ${departamentoId}
+  `);
+  return Boolean(s);
+}
+
 // ---------------------------------------------------------------- colaborador
 
 export async function criarColaborador(fd: FormData): Promise<Resultado> {
@@ -208,7 +220,7 @@ export async function criarTarefa(fd: FormData): Promise<Resultado> {
   if (descricao.length < 3) return { ok: false, erro: 'Descreva a tarefa.' };
 
   const setorId = Number(fd.get('setorId'));
-  if (!Number.isInteger(setorId) || setorId <= 0) {
+  if (!idValido(setorId) || !(await setorDoDepartamento(setorId, ctx.departamentoId))) {
     return { ok: false, erro: 'Escolha um setor para a tarefa.' };
   }
 
@@ -267,6 +279,9 @@ export async function editarTarefa(fd: FormData): Promise<Resultado> {
   if (descricao.length < 3) return { ok: false, erro: 'Descreva a tarefa.' };
 
   const setorId = Number(fd.get('setorId'));
+  if (!idValido(setorId) || !(await setorDoDepartamento(setorId, ctx.departamentoId))) {
+    return { ok: false, erro: 'Escolha um setor para a tarefa.' };
+  }
   const periodicidade = texto(fd.get('periodicidade'), 20) || 'mensal';
   if (!['diaria', 'semanal', 'mensal', 'anual'].includes(periodicidade)) {
     return { ok: false, erro: 'Periodicidade inválida.' };
@@ -345,8 +360,12 @@ export async function definirNivelNaTarefa(
   if (!ctx.cicloAberto) {
     return { ok: false, erro: 'Não há ciclo aberto para receber esta marcação.' };
   }
+  // os argumentos chegam do navegador e podem ser qualquer coisa
+  if (!idValido(tarefaId) || !idValido(colaboradorId)) {
+    return { ok: false, erro: 'Célula inválida.' };
+  }
   if (!ehNivelValido(valor)) {
-    return { ok: false, erro: `Nível inválido: ${valor}. Os valores possíveis são 0 a 4.` };
+    return { ok: false, erro: 'Nível inválido. Os valores possíveis são 0 a 4.' };
   }
 
   const linhas = await db.execute<{ tarefa_id: string }>(sql`

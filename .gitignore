@@ -1,0 +1,13 @@
+# Dados reais do departamento — avaliação de pessoas com nome. Nunca no git.
+*.xlsx
+*.xls
+*.csv
+*.dump
+*.sql.gz
+
+# Segredos e ambiente, em qualquer pasta
+.env
+.env.*
+!.env.example
+*.pem
+*.key

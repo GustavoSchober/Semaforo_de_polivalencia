@@ -32,7 +32,7 @@ export type Cenario = {
  */
 export async function simular(cicloId: number, ausentes: number[]): Promise<Cenario> {
   // a lista vem da interface; nada além de inteiros chega ao SQL
-  const ids = ausentes.filter((n) => Number.isInteger(n) && n > 0);
+  const ids = ausentes.filter((n) => Number.isSafeInteger(n) && n > 0).slice(0, 500);
 
   const linhas = await db.execute<{
     tarefa_id: string;

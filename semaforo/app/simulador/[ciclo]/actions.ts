@@ -1,6 +1,7 @@
 "use server";
 
 import { simular, type Cenario } from "@/lib/db/consultas/simulacao";
+import { usuarioAtual } from "@/lib/auth/sessao";
 
 /**
  * Recalcula o semáforo removendo um conjunto de pessoas.
@@ -17,7 +18,9 @@ export async function simularAusencia(
   cicloId: number,
   ausentes: number[],
 ): Promise<Cenario> {
-  if (!Number.isInteger(cicloId) || cicloId <= 0) {
+  // não escreve, mas lê avaliações: exige a mesma sessão que as telas
+  await usuarioAtual();
+  if (!Number.isSafeInteger(cicloId) || cicloId <= 0) {
     throw new Error("ciclo inválido");
   }
   return simular(cicloId, Array.isArray(ausentes) ? ausentes : []);

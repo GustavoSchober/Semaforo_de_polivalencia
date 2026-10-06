@@ -11,7 +11,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx --env-file=.env.local scripts/seed.ts",
-    "db:up": "podman start semaforo-db || podman run -d --name semaforo-db -e POSTGRES_PASSWORD=dev -e POSTGRES_USER=semaforo -e POSTGRES_DB=semaforo -p 5432:5432 -v semaforo-pgdata:/var/lib/postgresql/data docker.io/library/postgres:17",
+    "db:up": "podman start semaforo-db || podman run -d --name semaforo-db -e POSTGRES_PASSWORD=dev -e POSTGRES_USER=semaforo -e POSTGRES_DB=semaforo -p 127.0.0.1:5432:5432 -v semaforo-pgdata:/var/lib/postgresql/data docker.io/library/postgres:17",
     "db:down": "podman stop semaforo-db",
     "test": "vitest run testes/dominio.test.ts testes/permissoes.test.ts",
     "test:watch": "vitest",
