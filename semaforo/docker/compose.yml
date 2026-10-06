@@ -1,9 +1,12 @@
-# Topologia da seção 14.1: três contêineres, e SÓ o proxy publica porta.
-# O Postgres não é alcançável de fora do host — metade da segurança do sistema,
-# e é de graça.
+# Dois contêineres: o Postgres e a aplicação. Nenhum publica porta para fora
+# do host — a aplicação escuta só em 127.0.0.1:3200, e quem a expõe é o
+# Tailscale (`tailscale funnel`), que cuida do TLS. A Vercel empresta o
+# domínio e repassa os pedidos para o endereço do Funnel (ver next.config.ts).
 #
-# Roda igual com Docker ou com Podman (`docker compose` aqui aponta para o
-# Podman via podman-docker).
+# O Postgres não é alcançável de fora do host — metade da segurança do
+# sistema, e é de graça.
+
+name: semaforo
 
 services:
   postgres:
@@ -28,30 +31,20 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile
+      target: run
+      args:
+        DOMINIOS_PUBLICOS: ${DOMINIOS_PUBLICOS:-}
     environment:
       DATABASE_URL_FILE: /run/secrets/database_url
-      AUTH_SECRET_FILE: /run/secrets/auth_secret
       NODE_ENV: production
+      TZ: America/Sao_Paulo
     secrets:
       - database_url
-      - auth_secret
+    ports:
+      - '127.0.0.1:3200:3000'
     depends_on:
       postgres:
         condition: service_healthy
-    restart: unless-stopped
-    # sem "ports": só o Caddy alcança a aplicação
-
-  caddy:
-    image: docker.io/library/caddy:2
-    ports:
-      - '80:80'
-      - '443:443'
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddydata:/data
-      - caddyconfig:/config
-    depends_on:
-      - app
     restart: unless-stopped
     logging:
       driver: json-file
@@ -60,15 +53,26 @@ services:
         max-size: '10m'
         max-file: '5'
 
+  # Só roda sob demanda: `docker compose run --rm migrador`
+  migrador:
+    profiles: ['ferramentas']
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: migrador
+    environment:
+      DATABASE_URL_FILE: /run/secrets/database_url
+    secrets:
+      - database_url
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 secrets:
   db_password:
     file: ./secrets/db_password
   database_url:
     file: ./secrets/database_url
-  auth_secret:
-    file: ./secrets/auth_secret
 
 volumes:
   pgdata:
-  caddydata:
-  caddyconfig:

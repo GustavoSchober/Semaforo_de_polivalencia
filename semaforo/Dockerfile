@@ -11,7 +11,16 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+# domínios públicos extras (além de *.vercel.app) que podem disparar Server
+# Actions; entra no build porque o next.config é congelado nele
+ARG DOMINIOS_PUBLICOS=""
+ENV DOMINIOS_PUBLICOS=$DOMINIOS_PUBLICOS
 RUN npm run build
+
+# As migrations rodam a partir desta imagem, que tem o drizzle-kit
+# (`docker compose run --rm migrador`). A imagem de execução não tem.
+FROM build AS migrador
+CMD ["npx", "drizzle-kit", "migrate"]
 
 FROM node:22-alpine AS run
 WORKDIR /app
@@ -23,11 +32,6 @@ RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
 COPY --from=build /app/public ./public
 COPY --from=build --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=build --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# as migrations vão junto: elas rodam a partir desta imagem, com o usuário de
-# banco de mais privilégio (ADR-006)
-COPY --from=build /app/drizzle ./drizzle
-COPY --from=build /app/drizzle.config.ts ./drizzle.config.ts
 
 USER nextjs
 EXPOSE 3000

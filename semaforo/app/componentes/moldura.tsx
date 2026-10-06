@@ -101,7 +101,11 @@ export function Painel({
             travada fazia o conteúdo transbordar por cima da navegação assim que
             a linha quebrava — o que acontece em qualquer tela estreita. */}
         <div className="aco relative flex min-h-16 flex-wrap items-center justify-between gap-x-8 gap-y-2 border-b border-black px-9 py-2">
-          <Rebite lado="left" />
+          {/* O rebite do lado do título acende como um semáforo. */}
+          <span
+            className="rebite-semaforo absolute top-1/2 left-3 h-2.5 w-2.5 -translate-y-1/2 rounded-full"
+            aria-hidden="true"
+          />
           <Rebite lado="right" />
 
           <div className="flex flex-wrap items-baseline gap-x-5 gap-y-1">

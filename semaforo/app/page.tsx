@@ -100,9 +100,18 @@ export default async function Home() {
     >
       <div className="px-5 py-10">
         <div className="max-w-[68ch]">
-          <h1 className="letreiro placa text-[1.75rem] leading-[1.15]">
-            Quantas pessoas sabem fazer cada tarefa
-          </h1>
+          {/* `w-max` deixa o semáforo passar da coluna de 68ch e ficar ao lado
+              do título; em tela estreita ele quebra para baixo. */}
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-3 lg:w-max lg:flex-nowrap">
+            <h1 className="letreiro placa text-[1.75rem] leading-[1.15]">
+              Quantas pessoas sabem fazer cada tarefa
+            </h1>
+            <span className="caixa-semaforo" aria-hidden="true">
+              <Lampada pessoas={0} tamanho={16} />
+              <Lampada pessoas={2} tamanho={16} />
+              <Lampada pessoas={3} tamanho={16} />
+            </span>
+          </div>
           <p className="conteudo mt-5 text-[0.9375rem] leading-relaxed text-aco">
             E o que acontece se uma delas sair amanhã. Cada ciclo abaixo é um mês
             congelado do departamento: a matriz que foi preenchida, o risco que ela

@@ -16,6 +16,10 @@ const archivo = Archivo({
   display: "swap",
 });
 
+// Toda tela lê o banco na hora. Sem isto o build tenta prerenderizar as rotas
+// que não declaram `dynamic` sozinhas — e falha onde não há banco.
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Semáforo de Polivalência",
   description:

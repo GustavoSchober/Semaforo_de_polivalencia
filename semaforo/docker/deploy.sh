@@ -13,10 +13,10 @@ echo "1/4  dump manual antes da migration (o botão de desfazer)"
 ./backup.sh
 
 echo "2/4  build da imagem"
-docker compose build app
+docker compose build app migrador
 
 echo "3/4  migrations"
-docker compose run --rm app npx drizzle-kit migrate
+docker compose run --rm migrador
 
 echo "4/4  subindo a aplicação"
 docker compose up -d app
