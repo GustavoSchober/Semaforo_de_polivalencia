@@ -297,6 +297,7 @@ disciplina, porque são exatamente as regras que a planilha erra.
 | `consultas/evolucao.ts` | `evolucaoDosColaboradores()`, `evolucaoDaCobertura()` |
 | `consultas/capacidade.ts` | `pessoasPorTarefa()` — QUEM está em cada tarefa, para os popovers |
 | `consultas/administracao.ts` | `colaboradoresDoDepartamento()`, `setoresDoDepartamento()`, `tarefasDoDepartamento()`, `tarefaPorId()` |
+| `consultas/desligados.ts` | `historicoDoDesligado()` (o quadro que a pessoa deixou), `expurgarDesligados()` (a única escrita destrutiva) |
 | `ciclo-vigente.ts` | `garantirCicloDoMes()` (a virada automática), `celulasHerdadas()`, `ciclosNoFuturo()` |
 
 E, em `lib/dominio/` (funções puras, sem nenhum import):
@@ -305,7 +306,7 @@ E, em `lib/dominio/` (funções puras, sem nenhum import):
 |---|---|
 | `elenco.ts` | `quemAlcanca()`, `quemRestaria()` — usadas no cliente, por isso não podem morar junto da consulta |
 
-**Migrations aplicadas: 4.** Ambas registradas em `drizzle/meta/_journal.json` e no
+**Migrations aplicadas: 5.** Todas registradas em `drizzle/meta/_journal.json` e no
 banco (`drizzle.__drizzle_migrations`).
 
 | Migration | Conteúdo |
@@ -314,6 +315,7 @@ banco (`drizzle.__drizzle_migrations`).
 | `0001_camada_de_calculo.sql` | 6 views + 1 função (escrita à mão, registrada como `--custom`) |
 | `0002_vigencia_e_heranca.sql` | Enum `origem_nivel` ganha `'herdado'`; nasce `v_nivel_vigente` e TODA a camada acima é recriada sobre ela; a função de simulação também |
 | `0003_vigencia_sem_inicio.sql` | Conserta a `0002`: o filtro por `ativa_desde` apagava todo ciclo anterior a hoje, porque esse campo recebe `current_date` no cadastro |
+| `0004_desligamento_imediato.sql` | O **mês da saída** já não conta em `v_nivel_vigente`; nasce `f_expurgar_desligados()`, a retenção de 3 meses (ver 6.19) |
 
 **As 6 views e a função:**
 
@@ -326,6 +328,7 @@ banco (`drizzle.__drizzle_migrations`).
 | `v_evolucao` | A aba `Gráfico` |
 | `v_evolucao_cobertura` | Não existe na planilha — sugestão 6 da seção 9.2 |
 | `f_semaforo_simulado(ciclo, ausentes[])` | Zerar a coluna de alguém à mão |
+| `f_expurgar_desligados(departamento, meses)` | Apagar a aba de quem saiu — e torcer para ter guardado cópia |
 | `v_nivel_vigente` | Não existe na planilha — é o filtro de vigência, e a base de todas as outras |
 
 ⚠️ **`v_nivel_vigente` é o ponto de entrada de tudo.** Se você precisar mudar quem conta
@@ -398,17 +401,18 @@ Requisitos não negociáveis da seção 9.1, todos atendidos:
 | `seed-dev.ts` | 3 ciclos e 960 células **sintéticas**. As referências são relativas ao relógio desde 28/09/2026 — antes eram fixas, e foi a causa do descompasso de datas. |
 | `realinhar-ciclos.ts` | Desloca os ciclos para alinhar o mais recente com o mês corrente. Simula por padrão; `--aplicar` grava. **Só para dados sintéticos.** |
 
-### 4.6 Testes — 39, todos passando
+### 4.6 Testes — 45, todos passando
 
 | Arquivo | Testes | Precisa de banco? |
 |---|---|---|
 | `testes/dominio.test.ts` | 16 | Não |
 | `testes/permissoes.test.ts` | 13 | Não |
 | `testes/db/calculos.test.ts` | 10 | **Sim** |
+| `testes/db/desligamento.test.ts` | 6 | **Sim** |
 
 ```bash
 npm test        # 29 testes puros, sem banco
-npm run test:db # 10 testes das views
+npm run test:db # 16 testes das views e do expurgo
 npm run test:all
 ```
 
@@ -686,6 +690,55 @@ A tela da tarefa (`/gerenciar/catalogo/[tarefa]`) é **a matriz vista de lado** 
 células de `nivel`, pela outra face. "Quantas executam" e "quantas ensinam" continuam
 derivadas de `v_nivel_vigente` na leitura. A tela diz isso ao usuário, com essas palavras:
 *"Não existe nenhum lugar onde eles possam ser digitados."*
+
+### 6.19 Desligar faz sumir — e o que sobra tem prazo de validade
+
+A regra da `0002` mantinha a pessoa no ciclo do **próprio mês em que ela saiu**
+(`saida_em >= referencia`). Quem era desligado dia 5 continuava ocupando coluna na matriz,
+linha no simulador e cabeça no painel até o dia 1º seguinte — e a matriz, pior, lia `nivel`
+cru e não filtrava nem depois da virada.
+
+A migration `0004` troca o filtro por `referencia < date_trunc('month', saida_em)`: o mês da
+saída já não conta. Matriz, painel, simulador e evolução perdem a pessoa no mesmo instante
+em que o gestor clica em Desligar. Os meses **anteriores** ao da saída continuam intactos.
+Consequência assumida: um ciclo já fechado em que alguém saiu no meio do mês passa a ser
+recalculado sem essa pessoa — é correção, porque aquele mês terminou sem ela.
+
+Junto com o filtro, quatro consultas que liam `nivel` cru passaram a ler `v_nivel_vigente`:
+`matrizDoCiclo` (as duas consultas), `pessoasDoCiclo` do simulador e `celulasPendentes`. A
+evolução filtra `saida_em is null` — a curva de quem saiu não é acompanhada por ninguém.
+
+**Retenção de 3 meses** (`RETENCAO_DESLIGADO_MESES`, em `lib/dominio/constantes.ts`). O
+quadro que a pessoa deixou vai para uma gaveta "Histórico" ao lado de Editar e Readmitir,
+em `/gerenciar`: é a matriz vista por uma pessoa só, lida do último ciclo em que ela foi
+avaliada. É o único lugar do sistema que lê `nivel` cru de propósito — `v_nivel_vigente`
+existe para esconder quem saiu, e ali a pergunta é a oposta.
+
+Passados os três meses, `f_expurgar_desligados()` apaga de verdade: níveis, autoavaliações
+e cadastro, e com ele a possibilidade de readmitir. **É a única escrita destrutiva do
+sistema.** Não há cron: ela roda na virada do mês e a cada abertura de `/gerenciar`, pelo
+mesmo motivo que a virada roda no primeiro acesso. As referências que só registram autoria
+(`nivel.atualizado_por`, `ciclo.fechado_por`, `autoavaliacao.decidido_por`) perdem o autor,
+não a linha.
+
+Testado em `testes/db/desligamento.test.ts`.
+
+### 6.20 "3 3 3 3" não é quatro pessoas — o semáforo completo ganhou cabeçalho
+
+No painel de risco, a tabela do *Semáforo completo* imprimia quatro números sem dono. Como
+as colunas são **cumulativas** (quem está no 4 também é contado em 3, 2 e 1), três pessoas
+no nível 4 produziam `3 3 3 3` — lido como doze pessoas, ou como quatro. O balão do "i"
+listava três nomes e parecia contradizer a linha.
+
+Os números estavam certos; a disposição é que não dizia o que eram. Três mudanças, nenhuma
+de cálculo:
+
+- a tabela ganhou `<thead>` com **N1 N2 N3 N4** alinhado sobre as quatro células, e a seção
+  ganhou a `LegendaNiveis` por extenso;
+- a descrição da seção diz, com o exemplo, que a contagem é cumulativa;
+- cada linha do balão passou a imprimir **o nível numérico** junto do rótulo, e o separador
+  antes de "herdado" virou um caractere de verdade — a margem CSS sumia na cópia e produzia
+  `Consegue fazer e ensinarherdado`, que foi como o problema apareceu.
 
 ---
 
